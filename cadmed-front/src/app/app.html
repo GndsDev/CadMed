@@ -1,0 +1,123 @@
+<div class="app-wrapper">
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">⚕️</div>
+        <div class="brand-text">
+          <h1 class="gradient-text">CadMed</h1>
+          <span class="subtitle">Portal Clínico Inteligente</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="glass-card form-section">
+        <div class="card-header">
+          <h2>{{ formCadastro.id ? '✏️ Editar Paciente' : '✨ Novo Paciente' }}</h2>
+          <p class="header-desc">Preencha os dados abaixo para registar no sistema.</p>
+        </div>
+
+        <form (ngSubmit)="submit()" #f="ngForm" class="cad-form">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome Completo</label>
+              <input [(ngModel)]="formCadastro.nome" name="nome" placeholder="Ex: João Miguel Silva" required>
+            </div>
+
+            <div class="input-group">
+              <label>Quadro Clínico / Sintomas</label>
+              <input [(ngModel)]="formCadastro.descricao" name="descricao" placeholder="Ex: Cefaleia e febre" required>
+            </div>
+
+            <div class="input-group">
+              <label>Idade</label>
+              <input [(ngModel)]="formCadastro.idade" name="idade" type="number" placeholder="Anos" required>
+            </div>
+
+            <div class="input-group">
+              <label>Género</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="formCadastro.sexo" name="sexo" required>
+                  <option value="" disabled selected>Selecione...</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-gradient" [disabled]="!f.valid || enviando()">
+              {{ enviando() ? '⏳ A processar...' : (formCadastro.id ? 'Guardar Alterações' : 'Registar Paciente') }}
+            </button>
+            <button type="button" class="btn btn-outline" *ngIf="formCadastro.id" (click)="limpar()" [disabled]="enviando()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="glass-card table-section">
+        <div class="card-header flex-header">
+          <h2>📋 Pacientes Registados</h2>
+          <div class="total-badge">{{ cadastros().length }} Registos</div>
+        </div>
+
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Diagnóstico/Notas</th>
+                <th>Idade/Sexo</th>
+                <th>Data</th>
+                <th class="text-center">Gestão</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of cadastros()" class="table-row">
+                <td>
+                  <div class="patient-info">
+                    <div class="avatar">{{ item.nome ? (item.nome.charAt(0) | uppercase) : '?' }}</div>
+                    <div>
+                      <div class="fw-bold">{{ item.nome }}</div>
+                      <div class="id-text">ID: #{{ item.id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="desc-cell">{{ item.descricao }}</td>
+                <td>
+                  <div class="demographics">
+                    <span class="age-badge">{{ item.idade }} anos</span>
+                    <span class="sex-text">{{ item.sexo }}</span>
+                  </div>
+                </td>
+                <td><span class="date-badge">{{ formatarData(item.data) }}</span></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="action-btn edit" (click)="editar(item)" title="Editar" [disabled]="enviando()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="action-btn delete" (click)="remover(item.id!)" title="Eliminar" [disabled]="enviando()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="cadastros().length === 0">
+                <td colspan="5">
+                  <div class="empty-state">
+                    <div class="empty-illustration">🗂️</div>
+                    <h3>Base de dados vazia</h3>
+                    <p>Os pacientes registados irão aparecer aqui.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
