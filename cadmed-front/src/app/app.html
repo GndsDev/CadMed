@@ -1,6 +1,36 @@
-<div class="app-wrapper">
+<div class="app-wrapper" *ngIf="!estaLogado()">
+  <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <section class="glass-card form-section" style="max-width: 450px; width: 100%;">
+      <div class="card-header" style="text-align: center;">
+        <div class="logo-icon" style="font-size: 3rem; margin-bottom: 10px;">⚕️</div>
+        <h2 class="gradient-text">CadMed</h2>
+        <p class="header-desc">Acesso Restrito a Médicos</p>
+      </div>
+      <form class="cad-form">
+        <div class="form-grid" style="grid-template-columns: 1fr;">
+          <div class="input-group">
+            <label>E-mail</label>
+            <input type="email" name="email" [(ngModel)]="formLogin.email" placeholder="medico@cadmed.com" required>
+          </div>
+          <div class="input-group">
+            <label>Senha</label>
+            <input type="password" name="senha" [(ngModel)]="formLogin.senha" placeholder="Digite sua senha" required>
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top: 1.5rem; justify-content: center;">
+          <button type="button" class="btn btn-gradient" style="width: 100%;" (click)="fazerLogin()" [disabled]="enviando()">
+            {{ enviando() ? '⏳ Autenticando...' : 'Entrar no Sistema' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="app-wrapper" *ngIf="estaLogado()">
   <div class="container">
-    <header class="header">
+
+    <header class="header" style="display: flex; justify-content: space-between; align-items: center;">
       <div class="brand">
         <div class="logo-icon">⚕️</div>
         <div class="brand-text">
@@ -8,116 +38,221 @@
           <span class="subtitle">Portal Clínico Inteligente</span>
         </div>
       </div>
+      <button class="btn-logout" (click)="sair()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Sair
+      </button>
     </header>
 
+    <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+      <button class="btn" [ngClass]="abaAtual() === 'pacientes' ? 'btn-gradient' : 'btn-outline'" (click)="mudarAba('pacientes')" style="min-width: 200px;">
+        👥 Gestão de Pacientes
+      </button>
+      <button class="btn" [ngClass]="abaAtual() === 'agenda' ? 'btn-gradient' : 'btn-outline'" (click)="mudarAba('agenda')" style="min-width: 200px;">
+        📅 Agenda de Consultas
+      </button>
+    </div>
+
     <main class="main-content">
-      <section class="glass-card form-section">
-        <div class="card-header">
-          <h2>{{ formCadastro.id ? '✏️ Editar Paciente' : '✨ Novo Paciente' }}</h2>
-          <p class="header-desc">Preencha os dados abaixo para registar no sistema.</p>
-        </div>
 
-        <form (ngSubmit)="submit()" #f="ngForm" class="cad-form">
-          <div class="form-grid">
-            <div class="input-group">
-              <label>Nome Completo</label>
-              <input [(ngModel)]="formCadastro.nome" name="nome" placeholder="Ex: João Miguel Silva" required>
-            </div>
-
-            <div class="input-group">
-              <label>Quadro Clínico / Sintomas</label>
-              <input [(ngModel)]="formCadastro.descricao" name="descricao" placeholder="Ex: Cefaleia e febre" required>
-            </div>
-
-            <div class="input-group">
-              <label>Idade</label>
-              <input [(ngModel)]="formCadastro.idade" name="idade" type="number" placeholder="Anos" required>
-            </div>
-
-            <div class="input-group">
-              <label>Género</label>
-              <div class="select-wrapper">
-                <select [(ngModel)]="formCadastro.sexo" name="sexo" required>
-                  <option value="" disabled selected>Selecione...</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Feminino">Feminino</option>
-                  <option value="Outro">Outro</option>
-                </select>
+      <ng-container *ngIf="abaAtual() === 'pacientes'">
+        <section class="glass-card form-section">
+          <div class="card-header">
+            <h2>{{ formCadastro.id ? '✏️ Editar Paciente' : '✨ Novo Paciente' }}</h2>
+            <p class="header-desc">Preencha os dados abaixo para registar no sistema.</p>
+          </div>
+          <form (ngSubmit)="submit()" #f="ngForm" class="cad-form">
+            <div class="form-grid">
+              <div class="input-group">
+                <label>Nome Completo</label>
+                <input [(ngModel)]="formCadastro.nome" name="nome" placeholder="Ex: João Miguel Silva" required>
+              </div>
+              <div class="input-group">
+                <label>Quadro Clínico / Sintomas</label>
+                <input [(ngModel)]="formCadastro.descricao" name="descricao" placeholder="Ex: Cefaleia e febre" required>
+              </div>
+              <div class="input-group">
+                <label>Idade</label>
+                <input [(ngModel)]="formCadastro.idade" name="idade" type="number" placeholder="Anos" required>
+              </div>
+              <div class="input-group">
+                <label>Gênero</label>
+                <div class="select-wrapper">
+                  <select [(ngModel)]="formCadastro.sexo" name="sexo" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
               </div>
             </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-gradient" [disabled]="!f.valid || enviando()">
+                {{ enviando() ? '⏳ A processar...' : (formCadastro.id ? 'Guardar Alterações' : 'Registar Paciente') }}
+              </button>
+              <button type="button" class="btn btn-outline" *ngIf="formCadastro.id" (click)="limpar()" [disabled]="enviando()">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="glass-card table-section">
+          <div class="card-header flex-header">
+            <h2>📋 Pacientes Registrados</h2>
+            <div class="total-badge">{{ cadastros().length }} Registros</div>
           </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-gradient" [disabled]="!f.valid || enviando()">
-              {{ enviando() ? '⏳ A processar...' : (formCadastro.id ? 'Guardar Alterações' : 'Registar Paciente') }}
-            </button>
-            <button type="button" class="btn btn-outline" *ngIf="formCadastro.id" (click)="limpar()" [disabled]="enviando()">
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section class="glass-card table-section">
-        <div class="card-header flex-header">
-          <h2>📋 Pacientes Registados</h2>
-          <div class="total-badge">{{ cadastros().length }} Registos</div>
-        </div>
-
-        <div class="table-container">
-          <table class="modern-table">
-            <thead>
-              <tr>
-                <th>Paciente</th>
-                <th>Diagnóstico/Notas</th>
-                <th>Idade/Sexo</th>
-                <th>Data</th>
-                <th class="text-center">Gestão</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of cadastros()" class="table-row">
-                <td>
-                  <div class="patient-info">
-                    <div class="avatar">{{ item.nome ? (item.nome.charAt(0) | uppercase) : '?' }}</div>
-                    <div>
-                      <div class="fw-bold">{{ item.nome }}</div>
-                      <div class="id-text">ID: #{{ item.id }}</div>
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Diagnóstico/Notas</th>
+                  <th>Idade/Sexo</th>
+                  <th>Data Registro</th>
+                  <th class="text-center">Gestão</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cadastros()" class="table-row">
+                  <td>
+                    <div class="patient-info">
+                      <div class="avatar">{{ item.nome ? (item.nome.charAt(0) | uppercase) : '?' }}</div>
+                      <div>
+                        <div class="fw-bold">{{ item.nome }}</div>
+                        <div class="id-text">Paciente Registrado</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td class="desc-cell">{{ item.descricao }}</td>
-                <td>
-                  <div class="demographics">
-                    <span class="age-badge">{{ item.idade }} anos</span>
-                    <span class="sex-text">{{ item.sexo }}</span>
-                  </div>
-                </td>
-                <td><span class="date-badge">{{ formatarData(item.data) }}</span></td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="action-btn edit" (click)="editar(item)" title="Editar" [disabled]="enviando()">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <button class="action-btn delete" (click)="remover(item.id!)" title="Eliminar" [disabled]="enviando()">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="cadastros().length === 0">
-                <td colspan="5">
-                  <div class="empty-state">
-                    <div class="empty-illustration">🗂️</div>
-                    <h3>Base de dados vazia</h3>
-                    <p>Os pacientes registados irão aparecer aqui.</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+                  </td>
+                  <td class="desc-cell">{{ item.descricao }}</td>
+                  <td>
+                    <div class="demographics">
+                      <span class="age-badge">{{ item.idade }} anos</span>
+                      <span class="sex-text">{{ item.sexo }}</span>
+                    </div>
+                  </td>
+                  <td><span class="date-badge">{{ formatarData(item.data) }}</span></td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="action-btn edit" (click)="editar(item)" title="Editar" [disabled]="enviando()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button class="action-btn delete" (click)="remover(item.id!)" title="Eliminar" [disabled]="enviando()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="cadastros().length === 0">
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <div class="empty-illustration">🗂️</div>
+                      <h3>Base de dados vazia</h3>
+                      <p>Os pacientes registrados irão aparecer aqui.</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </ng-container>
+
+      <ng-container *ngIf="abaAtual() === 'agenda'">
+
+        <section class="glass-card form-section">
+          <div class="card-header">
+            <h2>⏱️ Agendar Nova Consulta</h2>
+            <p class="header-desc">Selecione o paciente e defina a data e horário.</p>
+          </div>
+          <form class="cad-form">
+            <div class="form-grid">
+
+              <div class="input-group">
+                <label>Paciente</label>
+                <div class="select-wrapper">
+                  <select [(ngModel)]="formAgenda.pacienteId" name="pacienteId" required>
+                    <option value="" disabled selected>Escolha um paciente...</option>
+                    <option *ngFor="let paciente of cadastros()" [value]="paciente.id">
+                      {{ paciente.nome }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label>Data da Consulta</label>
+                <input type="date" [(ngModel)]="formAgenda.data" name="data" required>
+              </div>
+
+              <div class="input-group">
+                <label>Horário</label>
+                <input type="time" [(ngModel)]="formAgenda.hora" name="hora" required>
+              </div>
+
+              <div class="input-group">
+                <label>Motivo / Observações</label>
+                <input type="text" [(ngModel)]="formAgenda.observacoes" name="observacoes" placeholder="Ex: Retorno de exames">
+              </div>
+
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-gradient" (click)="agendar()" [disabled]="enviando() || !formAgenda.pacienteId || !formAgenda.data || !formAgenda.hora">
+                {{ enviando() ? '⏳ Agendando...' : 'Confirmar Agendamento' }}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="glass-card table-section">
+          <div class="card-header flex-header">
+            <h2>Próximas Consultas</h2>
+            <div class="total-badge">{{ agendamentos().length }} Agendadas</div>
+          </div>
+          <div class="table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Data e Horário</th>
+                  <th>Paciente</th>
+                  <th>Motivo/Observações</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let agenda of agendamentos()" class="table-row">
+                  <td>
+                    <div class="fw-bold text-primary">{{ formatarDataHora(agenda.dataHora) }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-bold">{{ agenda.paciente?.nome || 'Paciente Desconhecido' }}</div>
+                  </td>
+                  <td class="desc-cell">{{ agenda.observacoes || '-' }}</td>
+                  <td>
+                    <span class="date-badge" style="background: rgba(46, 204, 113, 0.2); color: #27ae60;">
+                      {{ agenda.status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="agendamentos().length === 0">
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <div class="empty-illustration">📅</div>
+                      <h3>Nenhuma consulta</h3>
+                      <p>Sua agenda está livre no momento.</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </ng-container>
+
     </main>
   </div>
 </div>

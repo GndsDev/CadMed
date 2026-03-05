@@ -19,11 +19,11 @@ export class CadastroService {
     return this.http.post<Cadastro>(this.API, item);
   }
 
-  atualizar(id: number, item: Cadastro): Observable<Cadastro> {
+  atualizar(id: string, item: Cadastro): Observable<Cadastro> {
     return this.http.put<Cadastro>(`${this.API}/${id}`, item);
   }
 
-  excluir(id: number): Observable<void> {
+  excluir(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API}/${id}`);
   }
 }

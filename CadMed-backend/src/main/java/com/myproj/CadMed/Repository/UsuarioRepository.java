@@ -1,15 +1,13 @@
 package com.myproj.CadMed.Repository;
 
-import com.myproj.CadMed.Model.Cadastro;
 import com.myproj.CadMed.Model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CadRepository extends JpaRepository<Cadastro, UUID> {
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
-    List<Cadastro> findByMedico(Usuario medico);
+    Optional<Usuario> findByEmail(String email);
 }

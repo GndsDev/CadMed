@@ -1,0 +1,48 @@
+services:
+  # 1. O BANCO DE DADOS (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: cadmed-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: cadmed
+      MYSQL_ROOT_PASSWORD: admin123  # Substitua pela sua senha real do MySQL se quiser
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql # Salva os dados para não perder se o contêiner reiniciar
+
+  # 2. O SEU BACK-END (Spring Boot)
+  backend:
+    build: 
+      context: ./CadMed-backend
+    container_name: cadmed-backend
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      # URL atualizada com os passes livres de segurança do MySQL 8
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/cadmed?useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin123
+      # ... (mantenha o resto que já estava aqui)
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # --- ADICIONE ESTAS DUAS LINHAS ABAIXO ---
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - JWT_SECRET=admin123
+    depends_on:
+      - db
+
+  # 3. O SEU FRONT-END (Angular + Nginx)
+  frontend:
+    build: 
+      context: ./cadmed-front # Nome da pasta onde está o Angular
+    container_name: cadmed-frontend
+    ports:
+      - "4200:80" # Continua abrindo no localhost:4200 para você, mas por baixo dos panos bate no Nginx (80)
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
