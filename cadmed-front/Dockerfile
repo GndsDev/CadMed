@@ -1,18 +1,21 @@
-# 1. Qual é o sistema base? (Um servidor Nginx ultra-leve)
-FROM nginx:alpine
+# 1. Estágio de Build (Usa o Node 22 para compilar o Angular)
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build --configuration=production
 
-# 2. Apaga a página padrão do Nginx
+# 2. Estágio do Nginx (Pega a pasta dist e serve com o proxy reverso)
+FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
-# 3. Copia a configuração que criamos para o Nginx
-COPY dist/cadmed-front/browser /usr/share/nginx/html
+# Copia o nosso arquivo de configuração personalizado do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 4. Copia os arquivos que o Angular gerou na pasta dist para dentro do servidor
-# ATENÇÃO: Troque "dist/cadmed" para o caminho exato onde o seu index.html foi gerado no Passo 1!
-COPY dist/cadmed-front /usr/share/nginx/html
+# Copia o Angular compilado.
+# ATENÇÃO: Confirme se a sua pasta local gera "browser" no final, senão remova o /browser da linha abaixo.
+COPY --from=build /app/dist/cadmed-front/browser /usr/share/nginx/html/
 
-# 5. Avisa que este contêiner vai rodar na porta 80
 EXPOSE 80
-
-# 6. Comando para iniciar o Nginx e mantê-lo rodando
 CMD ["nginx", "-g", "daemon off;"]

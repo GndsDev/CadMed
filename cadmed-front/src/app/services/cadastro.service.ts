@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cadastro } from '../models/cadastro';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CadastroService {
-  private readonly API = 'http://172.16.11.167:8080/cadastros';
+  private readonly API = `${environment.apiUrl}/cadastros`;
 
   constructor(private http: HttpClient) { }
 

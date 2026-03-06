@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Agendamento } from '../models/agendamento';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AgendamentoService {
-  private API = 'http://localhost:8080/agendamentos';
+  private API = `${environment.apiUrl}/agendamentos`;
 
   constructor(private http: HttpClient) {}
 
