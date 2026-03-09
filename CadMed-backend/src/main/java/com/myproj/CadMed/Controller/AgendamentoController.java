@@ -1,71 +1,67 @@
 package com.myproj.CadMed.Controller;
 
+import com.myproj.CadMed.DTO.DadosAgendamento;
 import com.myproj.CadMed.Model.AgendamentoPaciente;
-import com.myproj.CadMed.Model.Cadastro;
-import com.myproj.CadMed.Model.Usuario;
+import com.myproj.CadMed.Model.StatusAgendamento;
 import com.myproj.CadMed.Repository.AgendamentoRepository;
-import com.myproj.CadMed.Repository.CadRepository;
+import com.myproj.CadMed.Repository.MedicoRepository;
+import com.myproj.CadMed.Repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/agendamentos")
+@RequestMapping("/api/agendamentos")
 public class AgendamentoController {
 
     @Autowired
     private AgendamentoRepository agendamentoRepository;
 
     @Autowired
-    private CadRepository cadastroRepository;
+    private MedicoRepository medicoRepository;
 
-    // DTO (Record) para receber apenas os dados necessários do Angular
-    public record DadosAgendamento(UUID pacienteId, LocalDateTime dataHora, String observacoes) {}
+    @Autowired
+    private PacienteRepository pacienteRepository;
 
+    // 1. Criar um Agendamento
     @PostMapping
-    public ResponseEntity<AgendamentoPaciente> agendar(@RequestBody DadosAgendamento dados) {
-        // 1. Pega o médico logado através do Token JWT
-        Usuario medicoLogado = (Usuario) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+    @Transactional
+    public ResponseEntity<?> agendar(@RequestBody DadosAgendamento dados) {
 
-        // 2. Busca o paciente no banco de dados
-        Optional<Cadastro> pacienteOpt = cadastroRepository.findById(dados.pacienteId());
-        if (pacienteOpt.isEmpty()) {
-            return ResponseEntity.badRequest().build(); // Paciente não existe
-        }
+        // Vai buscar o Médico e o Paciente à base de dados usando o UUID seguro
+        var medico = medicoRepository.findById(dados.medicoId())
+                .orElseThrow(() -> new RuntimeException("Médico não encontrado!"));
 
-        Cadastro paciente = pacienteOpt.get();
+        var paciente = pacienteRepository.findById(dados.pacienteId())
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado!"));
 
-        // 3. Trava de Segurança: O paciente pertence a este médico?
-        assert medicoLogado != null;
-        if (!paciente.getMedico().getId().equals(medicoLogado.getId())) {
-            return ResponseEntity.status(403).build(); // Proibido!
-        }
+        // Monta a consulta
+        AgendamentoPaciente novoAgendamento = new AgendamentoPaciente();
+        novoAgendamento.setMedico(medico);
+        novoAgendamento.setPaciente(paciente);
+        novoAgendamento.setDataHora(dados.dataHora());
+        novoAgendamento.setStatus(StatusAgendamento.AGENDADO); // Define como agendado por padrão
 
-        // 4. Cria e salva o agendamento
-        AgendamentoPaciente agendamento = new AgendamentoPaciente();
-        agendamento.setMedico(medicoLogado);
-        agendamento.setPaciente(paciente);
-        agendamento.setDataHora(dados.dataHora());
-        agendamento.setObservacoes(dados.observacoes());
-        // O status já vem como "AGENDADO" por padrão lá no modelo
+        agendamentoRepository.save(novoAgendamento);
 
-        AgendamentoPaciente salvo = agendamentoRepository.save(agendamento);
-        return ResponseEntity.ok(salvo);
+        return ResponseEntity.ok().body("Consulta agendada com sucesso!");
     }
 
-    @GetMapping
-    public ResponseEntity<List<AgendamentoPaciente>> listar() {
-        Usuario medicoLogado = (Usuario) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+    // 2. Cancelar um Agendamento (Em vez de usar DELETE, usamos um PUT ou DELETE lógico)
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> cancelar(@PathVariable UUID id) {
 
-        // Retorna a lista ordenada pela data (da mais próxima para a mais distante)
-        List<AgendamentoPaciente> lista = agendamentoRepository.findByMedicoOrderByDataHoraAsc(medicoLogado);
-        return ResponseEntity.ok(lista);
+        var agendamento = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado!"));
+
+        // A Mágica do Soft Delete: Apenas mudamos o estado, não apagamos a linha!
+        agendamento.setStatus(StatusAgendamento.CANCELADO);
+        agendamentoRepository.save(agendamento);
+
+        return ResponseEntity.ok().body("Consulta cancelada no sistema.");
     }
 }

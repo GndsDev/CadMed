@@ -3,7 +3,10 @@ package com.myproj.CadMed.Model;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,11 +16,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Setter
+@Table(name = "usuarios")
+@Entity(name = "Usuario")
 @Getter
-@Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Usuario implements UserDetails {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,13 +42,21 @@ public class Usuario implements UserDetails {
     @Override
     @Nonnull
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == UserRole.MEDICO) {
-            return List.of(new SimpleGrantedAuthority("ROLE_MEDICO"), new SimpleGrantedAuthority("ROLE_PACIENTE"));
+        if (this.role == UserRole.SECRETARIA) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_SECRETARIA"),
+                    new SimpleGrantedAuthority("ROLE_MEDICO"),
+                    new SimpleGrantedAuthority("ROLE_PACIENTE")
+            );
+        } else if (this.role == UserRole.MEDICO) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_MEDICO"),
+                    new SimpleGrantedAuthority("ROLE_PACIENTE")
+            );
         } else {
             return List.of(new SimpleGrantedAuthority("ROLE_PACIENTE"));
         }
     }
-
 
     @Override
     @Nullable
@@ -50,14 +64,12 @@ public class Usuario implements UserDetails {
         return this.senha;
     }
 
-    // 3. Qual é o nome de usuário (login)? No nosso caso é o e-mail.
     @Override
     @Nonnull
     public String getUsername() {
         return this.email;
     }
 
-    // 4. A conta está ativa e não bloqueada? (Vamos colocar tudo 'true' para liberar)
     @Override
     public boolean isAccountNonExpired() { return true; }
 

@@ -15,7 +15,6 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    // Essa variável vai buscar uma senha secreta lá no seu application.properties
     @Value("${api.security.token.secret}")
     private String secret;
 
@@ -24,8 +23,10 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("cadmed-api")
-                    .withSubject(usuario.getEmail()) // Guardamos o e-mail dentro do token
-                    .withExpiresAt(gerarDataExpiracao()) // O token expira em 2 horas
+                    .withSubject(usuario.getEmail())
+                    .withClaim("role", usuario.getRole().name()) // O Angular vai saber o perfil!
+                    .withClaim("id", usuario.getId().toString()) // O Angular vai saber o ID!
+                    .withExpiresAt(gerarDataExpiracao())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token jwt", exception);
@@ -39,9 +40,9 @@ public class TokenService {
                     .withIssuer("cadmed-api")
                     .build()
                     .verify(token)
-                    .getSubject(); // Se for válido, devolve o e-mail
+                    .getSubject();
         } catch (JWTVerificationException exception) {
-            return ""; // Se o token for falso ou expirado, barra a requisição
+            return "";
         }
     }
 

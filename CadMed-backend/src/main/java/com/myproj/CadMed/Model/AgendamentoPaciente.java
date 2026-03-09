@@ -1,16 +1,20 @@
 package com.myproj.CadMed.Model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Setter
-@Getter
-@Entity
 @Table(name = "agendamentos")
+@Entity(name = "Agendamento")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AgendamentoPaciente {
 
     @Id
@@ -18,22 +22,17 @@ public class AgendamentoPaciente {
     private UUID id;
 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "medico_id")
+    private Medico medico;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
+
     private LocalDateTime dataHora;
 
-
-    private String status = "AGENDADO";
-
-
-    private String observacoes;
-
-
-    @ManyToOne
-    @JoinColumn(name = "medico_id")
-    private Usuario medico;
-
-
-    @ManyToOne
-    @JoinColumn(name = "paciente_id")
-    private Cadastro paciente;
-
+    @Enumerated(EnumType.STRING)
+    private StatusAgendamento status;
 }
