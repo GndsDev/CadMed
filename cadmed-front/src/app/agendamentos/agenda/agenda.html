@@ -1,0 +1,93 @@
+<div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+
+  <section class="glass-card form-section" style="margin-bottom: 0;">
+    <div class="card-header">
+      <h2>⏱️ Agendar Nova Consulta</h2>
+      <p class="header-desc">Selecione o paciente e defina a data e horário.</p>
+    </div>
+
+    <form class="cad-form">
+      <div class="form-grid">
+
+        <div class="input-group">
+          <label>Paciente</label>
+          <select [(ngModel)]="formAgenda.pacienteId" name="pacienteId" required>
+            <option value="" disabled selected>Escolha um paciente...</option>
+            <option *ngFor="let paciente of pacientes" [value]="paciente.id">
+              {{ paciente.nome }}
+            </option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Data da Consulta</label>
+          <input type="date" [(ngModel)]="formAgenda.data" name="data" required>
+        </div>
+
+        <div class="input-group">
+          <label>Horário</label>
+          <input type="time" [(ngModel)]="formAgenda.hora" name="hora" required>
+        </div>
+
+        <div class="input-group">
+          <label>Motivo / Observações</label>
+          <input type="text" [(ngModel)]="formAgenda.observacoes" name="observacoes" placeholder="Ex: Retorno de exames">
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-gradient" (click)="agendar()" [disabled]="carregando || !formAgenda.pacienteId || !formAgenda.data || !formAgenda.hora">
+          {{ carregando ? '⏳ A processar...' : 'Confirmar Agendamento' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="glass-card table-section" style="margin-bottom: 0;">
+    <div class="card-header flex-header">
+      <h2>📅 Próximas Consultas</h2>
+      <div class="total-badge">{{ agendamentos.length }} Agendadas</div>
+    </div>
+
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Data e Horário</th>
+            <th>Paciente</th>
+            <th>Motivo/Observações</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agenda of agendamentos" class="table-row">
+            <td>
+              <div class="fw-bold text-primary">{{ formatarDataHora(agenda.dataHora) }}</div>
+            </td>
+            <td>
+              <div class="fw-bold">{{ agenda.paciente?.nome || 'Paciente Desconhecido' }}</div>
+            </td>
+            <td class="desc-cell">{{ agenda.observacoes || '-' }}</td>
+            <td>
+              <span class="date-badge" style="background: rgba(46, 204, 113, 0.2); color: #27ae60;">
+                Confirmada
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="agendamentos.length === 0 && !carregando">
+            <td colspan="4">
+              <div class="empty-state">
+                <div class="empty-illustration">📅</div>
+                <h3>Nenhuma consulta</h3>
+                <p>A agenda está livre no momento.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>

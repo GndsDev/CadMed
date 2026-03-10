@@ -1,0 +1,56 @@
+<section class="glass-card form-section" style="max-width: 800px; margin: 0 auto;">
+  <div class="card-header">
+    <h2>✨ Registar Novo Paciente</h2>
+    <p class="header-desc">Preencha os dados pessoais para ter acesso à clínica.</p>
+  </div>
+
+  <form (ngSubmit)="cadastrar()" #pacienteForm="ngForm" class="cad-form">
+
+    <div class="form-grid">
+      <div class="input-group">
+        <label>Nome Completo</label>
+        <input type="text" name="nome" [(ngModel)]="paciente.nome" placeholder="Ex: João Silva" required>
+      </div>
+      <div class="input-group">
+        <label>CPF</label>
+        <input type="text" name="cpf" [(ngModel)]="paciente.cpf" placeholder="Apenas números" required>
+      </div>
+      <div class="input-group">
+        <label>Data de Nascimento</label>
+        <input type="date" name="dataNascimento" [(ngModel)]="paciente.dataNascimento" required>
+      </div>
+      <div class="input-group">
+        <label>Telefone / Telemóvel</label>
+        <input type="text" name="telefone" [(ngModel)]="paciente.telefone" placeholder="Ex: 912345678" required>
+      </div>
+    </div>
+
+    <hr style="border: 1px solid rgba(0,0,0,0.05); margin: 25px 0;">
+
+    <div class="card-header" style="margin-bottom: 1rem;">
+      <h2>🔐 Dados de Acesso</h2>
+    </div>
+
+    <div class="form-grid">
+      <div class="input-group">
+        <label>E-mail de Login</label>
+        <input type="email" name="email" [(ngModel)]="paciente.email" placeholder="paciente@cadmed.com" required>
+      </div>
+      <div class="input-group">
+        <label>Palavra-passe</label>
+        <input type="password" name="senha" [(ngModel)]="paciente.senha" placeholder="Crie uma senha forte" required>
+      </div>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem;">
+      <button type="submit" class="btn btn-gradient" [disabled]="!pacienteForm.valid">
+        Criar a minha conta
+      </button>
+    </div>
+
+    <div *ngIf="mensagem" style="color: #27ae60; background: rgba(46, 204, 113, 0.1); padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-weight: bold;">
+      {{ mensagem }}
+    </div>
+
+  </form>
+</section>

@@ -1,0 +1,32 @@
+<div class="login-container">
+  <section class="glass-card form-section" style="max-width: 450px; width: 100%;">
+    <div class="card-header" style="text-align: center;">
+      <div class="logo-icon" style="font-size: 3rem; margin-bottom: 10px;">⚕️</div>
+      <h2 class="gradient-text">CadMed</h2>
+      <p class="header-desc">Acesso Restrito ao Sistema</p>
+    </div>
+
+    <form class="cad-form" (ngSubmit)="fazerLogin()">
+      <div class="form-grid" style="grid-template-columns: 1fr;">
+        <div class="input-group">
+          <label>E-mail</label>
+          <input type="email" name="email" [(ngModel)]="formLogin.email" placeholder="email@cadmed.com" required>
+        </div>
+        <div class="input-group">
+          <label>Senha</label>
+          <input type="password" name="senha" [(ngModel)]="formLogin.senha" placeholder="Digite sua senha" required>
+        </div>
+      </div>
+
+      <div *ngIf="mensagemErro" style="color: #e74c3c; text-align: center; margin-top: 10px; font-weight: bold;">
+        {{ mensagemErro }}
+      </div>
+
+      <div class="form-actions" style="margin-top: 1.5rem; justify-content: center;">
+        <button type="submit" class="btn btn-gradient" style="width: 100%;" [disabled]="enviando">
+          {{ enviando ? '⏳ Autenticando...' : 'Entrar no Sistema' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

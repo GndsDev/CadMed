@@ -1,0 +1,77 @@
+<section class="glass-card table-section" style="max-width: 1000px; margin: 0 auto;">
+  <div class="card-header flex-header">
+    <h2>{{ authService.isMedico() ? 'Meus Pacientes' : 'Pacientes Registados' }}</h2>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <div class="total-badge">{{ pacientes.length }} Registos</div>
+      <button class="btn btn-primary" routerLink="/pacientes/novo" *ngIf="authService.isSecretaria()" style="cursor: pointer;">
+        + Novo Paciente
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!authService.isSecretaria() && !carregando && pacientes.length === 0" style="padding: 20px; text-align: center; color: var(--text-muted);">
+    <p>Voce nao tem permissao para criar pacientes. Apenas secretarias podem adicionar novos pacientes.</p>
+  </div>
+
+  <div *ngIf="carregando" style="text-align: center; padding: 20px; color: var(--text-muted);">
+    Carregando pacientes...
+  </div>
+
+  <div class="table-container" *ngIf="!carregando">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Contatos</th>
+          <th>Idade/Data Nasc.</th>
+          <th class="text-center">Gestao</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of pacientes" class="table-row">
+          <td>
+            <div class="patient-info">
+              <div class="avatar">{{ item.nome ? (item.nome.charAt(0) | uppercase) : '?' }}</div>
+              <div>
+                <div class="fw-bold">{{ item.nome }}</div>
+                <div class="id-text">CPF: {{ item.cpf }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="desc-cell">{{ item.email }}</div>
+            <div class="sex-text">{{ item.telefone }}</div>
+          </td>
+
+          <td>
+            <span class="date-badge">{{ item.dataNascimento }}</span>
+          </td>
+
+          <td>
+            <div class="action-buttons">
+              <button class="action-btn delete" (click)="remover(item.id)" title="Eliminar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="pacientes.length === 0">
+          <td colspan="4">
+            <div class="empty-state">
+              <div class="empty-illustration">🗂️</div>
+              <h3>Base de dados vazia</h3>
+              <p>Os pacientes registados irão aparecer aqui.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

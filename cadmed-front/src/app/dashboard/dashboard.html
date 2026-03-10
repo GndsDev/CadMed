@@ -1,0 +1,31 @@
+<div style="max-width: 1000px; margin: 0 auto;">
+  <div class="card-header" style="text-align: center; margin-bottom: 3rem;">
+    <h2 class="gradient-text" style="font-size: 2.5rem;">Bem-vindo ao CadMed</h2>
+    <p class="header-desc" *ngIf="isSecretaria()">Selecione uma das opções abaixo para gerir a clínica.</p>
+    <p class="header-desc" *ngIf="isMedico()">Acesse sua agenda e pacientes abaixo.</p>
+  </div>
+
+  <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+
+    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/agenda">
+      <div style="font-size: 3.5rem; margin-bottom: 1rem;">📅</div>
+      <h3>Agenda de Consultas</h3>
+      <p class="header-desc" *ngIf="isSecretaria()">Marque e visualize os horários dos médicos.</p>
+      <p class="header-desc" *ngIf="isMedico()">Visualize suas consultas agendadas.</p>
+    </div>
+
+    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/pacientes">
+      <div style="font-size: 3.5rem; margin-bottom: 1rem;">👥</div>
+      <h3>Gestão de Pacientes</h3>
+      <p class="header-desc" *ngIf="isSecretaria()">Listar, registar e editar dados de pacientes.</p>
+      <p class="header-desc" *ngIf="isMedico()">Visualize os seus pacientes.</p>
+    </div>
+
+    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/medicos" *ngIf="isSecretaria()">
+      <div style="font-size: 3.5rem; margin-bottom: 1rem;">👨‍⚕️</div>
+      <h3>Corpo Clínico</h3>
+      <p class="header-desc">Administre os profissionais de saúde da unidade.</p>
+    </div>
+
+  </div>
+</div>

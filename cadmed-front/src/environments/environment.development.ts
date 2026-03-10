@@ -1,4 +1,4 @@
 export const environment = {
-  production: true,
-  apiUrl: 'http://34.31.241.110' // Aqui vai o IP do Google Cloud sem a porta 8080!
+  production: false,
+  apiUrl: 'http://localhost:8080' // Aqui vai o IP do Google Cloud sem a porta 8080!
 };
