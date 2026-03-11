@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+
 import java.util.List;
 
 @Configuration
@@ -31,30 +32,44 @@ public class SecurityConfigurations {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         return httpSecurity
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ativa o CORS com a configuração abaixo
+                .csrf(AbstractHttpConfigurer::disable) // Desativa CSRF para APIs que usam Token
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Define autenticação Stateless
                 .authorizeHttpRequests(authorize -> authorize
-                        // Rotas públicas
+
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Rota de Autenticação (Pública)
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/pacientes").permitAll() // Um paciente pode registar-se a si mesmo
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
-                        // Rotas restritas à Secretária
-                        .requestMatchers(HttpMethod.POST, "/api/medicos").hasRole("SECRETARIA")
-                        .requestMatchers(HttpMethod.POST, "/api/agendamentos").hasRole("SECRETARIA")
-                        .requestMatchers(HttpMethod.DELETE, "/api/agendamentos/**").hasRole("SECRETARIA")
+                        // Rotas de Pacientes
+                        .requestMatchers(HttpMethod.POST, "/api/pacientes").hasRole("SECRETARIA") // Permite que pacientes se registem sozinhos
+                        .requestMatchers(HttpMethod.GET, "/api/pacientes").hasRole("SECRETARIA") // Apenas Secretaria lista pacientes
+                        .requestMatchers(HttpMethod.DELETE, "/api/pacientes/**").hasRole("SECRETARIA") // Apenas Secretaria remove pacientes
 
-                        // Qualquer outro pedido precisa de estar logado (com um token válido)
+                        // Rotas de Médicos
+                        .requestMatchers(HttpMethod.POST, "/api/medicos").hasRole("SECRETARIA") // Apenas Secretaria regista médicos
+                        .requestMatchers(HttpMethod.GET, "/api/medicos").hasRole("SECRETARIA") // Apenas Secretaria lista médicos
+                        .requestMatchers(HttpMethod.DELETE, "/api/medicos/**").hasRole("SECRETARIA") // Apenas Secretaria remove médicos
+
+                        // Rotas de Agendamentos
+                        .requestMatchers(HttpMethod.POST, "/api/agendamentos").hasRole("SECRETARIA") // Agendamento via Secretaria
+                        .requestMatchers(HttpMethod.GET, "/api/agendamentos").authenticated() // Visualização da agenda total
+                        .requestMatchers(HttpMethod.DELETE, "/api/agendamentos/**").authenticated() // Cancelamento via Secretaria
+                        .requestMatchers(HttpMethod.PATCH, "/api/agendamentos/*/status").authenticated()
+
+                        // Todas as outras rotas exigem autenticação genérica
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // Adiciona o filtro do Token JWT
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://34.31.241.110")); // Adicionado o IP de produção
+        // Define as origens permitidas (Localhost e IP de Produção)
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://34.31.241.110"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -73,4 +88,6 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 }

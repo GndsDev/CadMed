@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PacienteService } from '../../services/paciente.service';
@@ -9,9 +9,9 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-paciente-list',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './paciente-list.html' // (Ajuste para .component.html se for o caso)
+  templateUrl: './paciente-list.html'
 })
-export class PacienteListComponent implements OnInit { // <-- Nome da classe!
+export class PacienteListComponent implements OnInit {
 
   pacientes: any[] = [];
   carregando: boolean = true;
@@ -19,7 +19,8 @@ export class PacienteListComponent implements OnInit { // <-- Nome da classe!
   constructor(
     private pacienteService: PacienteService,
     private breadcrumbService: BreadcrumbService,
-    public authService: AuthService
+    public authService: AuthService,
+    private cdr: ChangeDetectorRef // <-- Ferramenta que força a tela a atualizar
   ) {}
 
   ngOnInit() {
@@ -33,24 +34,25 @@ export class PacienteListComponent implements OnInit { // <-- Nome da classe!
   carregarPacientes() {
     this.carregando = true;
     this.pacienteService.listar().subscribe({
-      next: (dados: any) => { // <-- Adicionado :any
-        // Se for medico, filtrar apenas pacientes dele
-        if (this.authService.isMedico()) {
-          const usuario = this.authService.obterUsuarioAtual();
-          if (usuario && usuario.id) {
-            this.pacientes = dados.filter((p: any) => p.medicoId === usuario.id);
-          } else {
-            this.pacientes = [];
-          }
-        } else {
-          // Se for secretaria, mostrar todos os pacientes
+      next: (dados: any) => {
+        const perfil = this.authService.getRole();
+
+        if (perfil === 'SECRETARIA') {
           this.pacientes = dados;
+        } else {
+          this.pacientes = [];
         }
+
+        // Tira o aviso de carregamento
         this.carregando = false;
+
+        // MÁGICA: Obriga o HTML a desenhar a tabela com os pacientes agora mesmo!
+        this.cdr.detectChanges();
       },
-      error: (erro: any) => { // <-- Adicionado :any
+      error: (erro: any) => {
         console.error('Erro ao buscar pacientes', erro);
         this.carregando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -62,7 +64,7 @@ export class PacienteListComponent implements OnInit { // <-- Nome da classe!
           alert('Paciente removido com sucesso!');
           this.carregarPacientes();
         },
-        error: (erro: any) => { // <-- Adicionado :any
+        error: (erro: any) => {
           alert('Erro ao remover paciente.');
           console.error(erro);
         }

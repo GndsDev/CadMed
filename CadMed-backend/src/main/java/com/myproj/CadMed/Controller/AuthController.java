@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+
 public class AuthController {
 
     @Autowired
@@ -20,7 +20,12 @@ public class AuthController {
     private TokenService tokenService;
 
     public record DadosAutenticacao(String email, String senha) {}
-    public record DadosTokenJWT(String token) {}
+
+    // 1. Criamos um record para os dados do utilizador
+    public record UsuarioResponseDTO(String id, String email, String nome, String role) {}
+
+    // 2. Atualizamos o record do Token para incluir o utilizador
+    public record DadosTokenJWT(String token, UsuarioResponseDTO usuario) {}
 
     @PostMapping("/login")
     public ResponseEntity<DadosTokenJWT> efetuarLogin(@RequestBody DadosAutenticacao dados) {
@@ -29,9 +34,19 @@ public class AuthController {
 
         if (authentication.getPrincipal() instanceof Usuario usuario) {
             var tokenJWT = tokenService.gerarToken(usuario);
-            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+
+            // Alterado aqui: em vez de usuario.getNome(), passamos uma string vazia ""
+            var usuarioResponse = new UsuarioResponseDTO(
+                    usuario.getId().toString(),
+                    usuario.getEmail(),
+                    "",
+                    usuario.getRole().name()
+            );
+
+            return ResponseEntity.ok(new DadosTokenJWT(tokenJWT, usuarioResponse));
         }
 
         return ResponseEntity.badRequest().build();
     }
+
 }

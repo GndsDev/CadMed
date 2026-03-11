@@ -1,5 +1,6 @@
 package com.myproj.CadMed.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +26,13 @@ public class Paciente {
     private String telefone;
     private String dataNascimento;
 
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore // <-- ISTO É OBRIGATÓRIO PARA A LISTA FUNCIONAR
     private Usuario usuario;
+
+    // <-- ISTO É OBRIGATÓRIO PARA O ANGULAR MOSTRAR O EMAIL NA TABELA
+    public String getEmail() {
+        return this.usuario != null ? this.usuario.getEmail() : "";
+    }
 }

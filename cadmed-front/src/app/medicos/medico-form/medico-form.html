@@ -28,17 +28,14 @@
     <hr style="border: 1px solid rgba(0,0,0,0.05); margin: 25px 0;">
 
     <div class="card-header" style="margin-bottom: 1rem;">
-      <h2>🔐 Dados de Acesso do Médico</h2>
+      <h2>📧 Dados de Contacto e Acesso</h2>
+      <p class="header-desc" style="font-size: 0.9rem; color: #e67e22;">A palavra-passe será gerada automaticamente pelo sistema.</p>
     </div>
 
-    <div class="form-grid">
+    <div class="form-grid" style="grid-template-columns: 1fr;">
       <div class="input-group">
-        <label>E-mail Corporativo</label>
+        <label>E-mail Corporativo (Será usado para o Login do Médico)</label>
         <input type="email" name="email" [(ngModel)]="medico.email" placeholder="medico@cadmed.com" required>
-      </div>
-      <div class="input-group">
-        <label>Palavra-passe Inicial</label>
-        <input type="password" name="senha" [(ngModel)]="medico.senha" placeholder="Defina uma senha" required>
       </div>
     </div>
 

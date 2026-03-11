@@ -12,8 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/pacientes")
+
 public class PacienteController {
 
     @Autowired
@@ -23,20 +27,16 @@ public class PacienteController {
     private UsuarioRepository usuarioRepository;
 
     @PostMapping
-    @Transactional // Se falhar a criação do paciente, a criação do utilizador é revertida
+    @Transactional
     public ResponseEntity<?> cadastrar(@RequestBody DadosCadastroPaciente dados) {
-
-        // 1. Verifica se o e-mail já existe
         if (this.usuarioRepository.findByEmail(dados.email()).isPresent()) {
             return ResponseEntity.badRequest().body("E-mail já registado!");
         }
 
-        // 2. Cria o Utilizador (Login) com o perfil de PACIENTE
         String senhaCriptografada = new BCryptPasswordEncoder().encode(dados.senha());
         Usuario novoUsuario = new Usuario(null, dados.email(), senhaCriptografada, UserRole.PACIENTE);
         usuarioRepository.save(novoUsuario);
 
-        // 3. Cria o Paciente e associa-o ao utilizador
         Paciente novoPaciente = new Paciente();
         novoPaciente.setNome(dados.nome());
         novoPaciente.setCpf(dados.cpf());
@@ -47,5 +47,22 @@ public class PacienteController {
         pacienteRepository.save(novoPaciente);
 
         return ResponseEntity.ok().body("Paciente registado com sucesso!");
+    }
+
+    // --- MÉTODOS NOVOS ADICIONADOS AQUI ---
+
+    @GetMapping
+    public ResponseEntity<List<Paciente>> listar() {
+        // Vai à base de dados buscar todos os pacientes e envia para o Angular
+        return ResponseEntity.ok(pacienteRepository.findAll());
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> excluir(@PathVariable UUID id) {
+        // Apaga o paciente pelo ID
+        pacienteRepository.deleteById(id);
+        return ResponseEntity.ok().body("Paciente removido com sucesso!");
     }
 }

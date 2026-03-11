@@ -12,8 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/medicos")
+
 public class MedicoController {
 
     @Autowired
@@ -23,29 +27,41 @@ public class MedicoController {
     private UsuarioRepository usuarioRepository;
 
     @PostMapping
-    @Transactional // Garante que se falhar o médico, falha o utilizador também (não salva pela metade)
+    @Transactional
     public ResponseEntity<?> cadastrar(@RequestBody DadosCadastroMedico dados) {
-
-        // 1. Verifica se o email já existe
         if (this.usuarioRepository.findByEmail(dados.email()).isPresent()) {
             return ResponseEntity.badRequest().body("Email já cadastrado!");
         }
 
-        // 2. Cria o Utilizador (Login)
         String senhaCriptografada = new BCryptPasswordEncoder().encode(dados.senha());
         Usuario novoUsuario = new Usuario(null, dados.email(), senhaCriptografada, UserRole.MEDICO);
         usuarioRepository.save(novoUsuario);
 
-        // 3. Cria o Médico e associa ao utilizador
         Medico novoMedico = new Medico();
         novoMedico.setNome(dados.nome());
         novoMedico.setCrm(dados.crm());
         novoMedico.setEspecialidade(dados.especialidade());
         novoMedico.setTelefone(dados.telefone());
-        novoMedico.setUsuario(novoUsuario); // Ligação mágica aqui!
+        novoMedico.setUsuario(novoUsuario);
 
         medicoRepository.save(novoMedico);
 
         return ResponseEntity.ok().body("Médico cadastrado com sucesso!");
+    }
+
+    // --- MÉTODOS NOVOS ADICIONADOS AQUI ---
+
+    @GetMapping
+    public ResponseEntity<List<Medico>> listar() {
+        // Vai à base de dados buscar todos os médicos e envia para o Angular
+        return ResponseEntity.ok(medicoRepository.findAll());
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> excluir(@PathVariable UUID id) {
+        // Apaga o médico pelo ID
+        medicoRepository.deleteById(id);
+        return ResponseEntity.ok().body("Médico removido com sucesso!");
     }
 }

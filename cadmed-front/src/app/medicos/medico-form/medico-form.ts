@@ -15,14 +15,13 @@ import { DadosCadastroMedico } from '../../models/medico';
 })
 export class MedicoFormComponent implements OnInit {
 
-  // O objeto vazio que vai ser preenchido pelo HTML
   medico: DadosCadastroMedico = {
     nome: '',
     crm: '',
     especialidade: '',
     telefone: '',
     email: '',
-    senha: ''
+    senha: '' // Fica vazio no início
   };
 
   mensagem: string = '';
@@ -42,15 +41,18 @@ export class MedicoFormComponent implements OnInit {
   }
 
   cadastrar() {
+    // 1. O sistema gera a palavra-passe padrão antes de enviar
+    this.medico.senha = 'cadmed123';
+
     this.medicoService.cadastrar(this.medico).subscribe({
-      // Adicionado ': any' para o TypeScript parar de reclamar
       next: (resposta: any) => {
-        alert('Médico registado com sucesso!');
+        // 2. Avisa a secretária de qual é a senha gerada
+        alert(`Médico registado com sucesso!\n\nPor favor, informe ao médico que a palavra-passe de acesso dele é: ${this.medico.senha}`);
         this.mensagem = 'Registo concluído!';
-        // Redireciona para a página principal (ou lista)
-        this.router.navigate(['/']);
+
+        // 3. Já redireciona diretamente para a lista de médicos
+        this.router.navigate(['/medicos']);
       },
-      // Adicionado ': any' aqui também
       error: (erro: any) => {
         console.error(erro);
         alert('Erro ao registar: ' + (erro.error || 'Verifique os dados.'));
