@@ -1,21 +1,26 @@
-name: Teste de Conexao SSH
+name: Deploy CadMed
 
+# 1. O Gatilho: Quando esse robô deve acordar?
 on:
   push:
     branches:
       - main
       - master
 
+# 2. As Tarefas: O que ele deve fazer?
 jobs:
-  testar:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Tentando entrar no GCP...
+      - name: Conectando no Servidor e Atualizando
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.GCP_IP }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
-            echo "A CONEXAO SSH FUNCIONOU PERFEITAMENTE!"
-            pwd
+            cd ~/CadMed
+            git pull origin main
+            docker compose build --no-cache
+            docker compose up -d --force-recreate
