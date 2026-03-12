@@ -1,4 +1,4 @@
-name: Deploy CadMed
+name: Teste de Conexao SSH
 
 on:
   push:
@@ -7,19 +7,15 @@ on:
       - master
 
 jobs:
-  deploy:
+  testar:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Conectando no Servidor e Atualizando
+      - name: Tentando entrar no GCP...
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.GCP_IP }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
-            cd ~/CadMed
-            git pull origin main
-            docker compose build --no-cache
-            docker compose up -d --force-recreate --remove-orphans
-            docker image prune -f
+            echo "A CONEXAO SSH FUNCIONOU PERFEITAMENTE!"
+            pwd
