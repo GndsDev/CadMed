@@ -30,8 +30,21 @@ export const routes: Routes = [
     canActivate: [RoleGuard],
     data: { role: UserRole.SECRETARIA }
   },
+
+  { path: 'pacientes/editar/:id',
+     component: PacienteFormComponent,
+     canActivate: [RoleGuard],
+     data: { role: UserRole.SECRETARIA }
+  },
+
+  { path: 'medicos/editar/:id',
+     component: MedicoFormComponent,
+     canActivate: [RoleGuard],
+     data: { role: UserRole.SECRETARIA }
+  },
   { path: 'pacientes', component: PacienteListComponent },
   { path: 'agenda', component: AgendaComponent },
   // Se abrir o site vazio, vai para a página de Login!
   { path: '', redirectTo: '/login', pathMatch: 'full' }
+
 ];

@@ -1,53 +1,81 @@
-<section class="glass-card form-section" style="max-width: 800px; margin: 0 auto;">
-  <div class="card-header">
-    <h2>👨‍⚕️ Registar Novo Médico</h2>
-    <p class="header-desc">Registe um novo profissional de saúde no sistema.</p>
+<section class="form-section">
+  <div class="glass-card form-container">
+
+    <div class="form-header">
+      <div class="header-titles">
+        <h2>{{ isEdicao ? 'Editar Médico' : 'Cadastrar Médico' }}</h2>
+        <p class="text-muted">
+          {{ isEdicao ? 'Atualize os dados profissionais do médico abaixo.' : 'Preencha os dados para registar um novo profissional na clínica.' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <form (ngSubmit)="salvar()" #medicoForm="ngForm">
+
+        <div class="form-grid">
+
+          <div class="form-group span-2">
+            <label>Nome Completo</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <input type="text" class="modern-input" [(ngModel)]="medico.nome" name="nome" placeholder="Ex: Dr. João da Silva" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>CRM</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <input type="text" class="modern-input" [(ngModel)]="medico.crm" name="crm" placeholder="Ex: 12345-UF" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Especialidade</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+              <input type="text" class="modern-input" [(ngModel)]="medico.especialidade" name="especialidade" placeholder="Ex: Cardiologia" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Telefone</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <input type="text" class="modern-input" [(ngModel)]="medico.telefone" name="telefone" placeholder="Ex: (00) 00000-0000" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email de Acesso</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <input type="email" class="modern-input" [(ngModel)]="medico.email" name="email" placeholder="Ex: medico@cadmed.com" required>
+            </div>
+          </div>
+
+          <div class="form-group span-2" *ngIf="!isEdicao">
+            <div class="info-alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <div>
+                <strong>Palavra-passe Padrão:</strong> A senha <b>cadmed123</b> será gerada automaticamente.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ isEdicao ? 'Salvar Alterações' : 'Cadastrar Médico' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
-
-  <form (ngSubmit)="cadastrar()" #medicoForm="ngForm" class="cad-form">
-
-    <div class="form-grid">
-      <div class="input-group">
-        <label>Nome Completo</label>
-        <input type="text" name="nome" [(ngModel)]="medico.nome" placeholder="Dr. António Costa" required>
-      </div>
-      <div class="input-group">
-        <label>CRM</label>
-        <input type="text" name="crm" [(ngModel)]="medico.crm" placeholder="Ex: 12345-SP" required>
-      </div>
-      <div class="input-group">
-        <label>Especialidade</label>
-        <input type="text" name="especialidade" [(ngModel)]="medico.especialidade" placeholder="Ex: Cardiologia" required>
-      </div>
-      <div class="input-group">
-        <label>Telefone</label>
-        <input type="text" name="telefone" [(ngModel)]="medico.telefone" placeholder="Ex: 912345678" required>
-      </div>
-    </div>
-
-    <hr style="border: 1px solid rgba(0,0,0,0.05); margin: 25px 0;">
-
-    <div class="card-header" style="margin-bottom: 1rem;">
-      <h2>📧 Dados de Contacto e Acesso</h2>
-      <p class="header-desc" style="font-size: 0.9rem; color: #e67e22;">A palavra-passe será gerada automaticamente pelo sistema.</p>
-    </div>
-
-    <div class="form-grid" style="grid-template-columns: 1fr;">
-      <div class="input-group">
-        <label>E-mail Corporativo (Será usado para o Login do Médico)</label>
-        <input type="email" name="email" [(ngModel)]="medico.email" placeholder="medico@cadmed.com" required>
-      </div>
-    </div>
-
-    <div class="form-actions" style="margin-top: 2rem;">
-      <button type="submit" class="btn btn-gradient" [disabled]="!medicoForm.valid">
-        Registar Profissional
-      </button>
-    </div>
-
-    <div *ngIf="mensagem" style="color: #27ae60; background: rgba(46, 204, 113, 0.1); padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-weight: bold;">
-      {{ mensagem }}
-    </div>
-
-  </form>
 </section>

@@ -20,7 +20,7 @@ export class PacienteListComponent implements OnInit {
     private pacienteService: PacienteService,
     private breadcrumbService: BreadcrumbService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef // <-- Ferramenta que força a tela a atualizar
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -33,20 +33,20 @@ export class PacienteListComponent implements OnInit {
 
   carregarPacientes() {
     this.carregando = true;
+
     this.pacienteService.listar().subscribe({
       next: (dados: any) => {
-        const perfil = this.authService.getRole();
-
-        if (perfil === 'SECRETARIA') {
+        if (Array.isArray(dados)) {
           this.pacientes = dados;
+        } else if (dados && dados.content) {
+          this.pacientes = dados.content;
+        } else if (dados) {
+          this.pacientes = [dados];
         } else {
           this.pacientes = [];
         }
 
-        // Tira o aviso de carregamento
         this.carregando = false;
-
-        // MÁGICA: Obriga o HTML a desenhar a tabela com os pacientes agora mesmo!
         this.cdr.detectChanges();
       },
       error: (erro: any) => {
@@ -58,7 +58,7 @@ export class PacienteListComponent implements OnInit {
   }
 
   remover(id: string) {
-    if (confirm('Tem a certeza que deseja eliminar este paciente?')) {
+    if (confirm('Tem a certeza que deseja eliminar este paciente do sistema?')) {
       this.pacienteService.excluir(id).subscribe({
         next: () => {
           alert('Paciente removido com sucesso!');

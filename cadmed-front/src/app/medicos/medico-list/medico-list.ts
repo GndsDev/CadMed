@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. Adicionado aqui
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MedicoService } from '../../services/medico.service';
@@ -19,7 +19,8 @@ export class MedicoListComponent implements OnInit {
   constructor(
     private medicoService: MedicoService,
     private breadcrumbService: BreadcrumbService,
-    public authService: AuthService
+    public authService: AuthService,
+    private cdr: ChangeDetectorRef // 2. Injetado aqui
   ) {}
 
   ngOnInit() {
@@ -32,14 +33,26 @@ export class MedicoListComponent implements OnInit {
 
   carregarMedicos() {
     this.carregando = true;
+
     this.medicoService.listar().subscribe({
       next: (dados: any) => {
-        this.medicos = dados;
+        if (Array.isArray(dados)) {
+          this.medicos = dados;
+        } else if (dados && dados.content) {
+          this.medicos = dados.content;
+        } else if (dados) {
+          this.medicos = [dados];
+        } else {
+          this.medicos = [];
+        }
+
         this.carregando = false;
+        this.cdr.detectChanges(); // 3. A MÁGICA: Força o HTML a desenhar a tabela agora!
       },
       error: (erro: any) => {
         console.error('Erro ao buscar médicos', erro);
         this.carregando = false;
+        this.cdr.detectChanges(); // Garante que a tela atualiza mesmo com erro
       }
     });
   }

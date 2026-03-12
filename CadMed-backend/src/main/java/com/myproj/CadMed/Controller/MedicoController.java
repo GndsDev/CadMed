@@ -49,19 +49,53 @@ public class MedicoController {
         return ResponseEntity.ok().body("Médico cadastrado com sucesso!");
     }
 
-    // --- MÉTODOS NOVOS ADICIONADOS AQUI ---
-
     @GetMapping
-    public ResponseEntity<List<Medico>> listar() {
-        // Vai à base de dados buscar todos os médicos e envia para o Angular
-        return ResponseEntity.ok(medicoRepository.findAll());
+    public ResponseEntity<List<Medico>> listarTodos() {
+        // Agora o Angular só recebe os médicos com ativo = true
+        return ResponseEntity.ok(medicoRepository.findAllByAtivoTrue());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Medico> buscarPorId(@PathVariable UUID id) {
+        // Vai ao banco de dados procurar o médico por este ID específico
+        return medicoRepository.findById(id)
+                .map(ResponseEntity::ok) // Se achar, devolve 200 OK com os dados
+                .orElse(ResponseEntity.notFound().build()); // Se não achar, devolve 404 Not Found
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> atualizarMedico(@PathVariable UUID id, @RequestBody Medico dadosAtualizados) {
+        return medicoRepository.findById(id).map(medicoExistente -> {
+
+            // 1. Atualiza os dados próprios do Médico
+            medicoExistente.setNome(dadosAtualizados.getNome());
+            medicoExistente.setCrm(dadosAtualizados.getCrm());
+            medicoExistente.setEspecialidade(dadosAtualizados.getEspecialidade());
+            medicoExistente.setTelefone(dadosAtualizados.getTelefone());
+
+            // 2. O SEGREDO: Atualiza o Email indo buscar o Usuário associado
+            // Verificamos se o usuário existe para evitar erro de NullPointer
+            if (medicoExistente.getUsuario() != null && dadosAtualizados.getUsuario() != null) {
+                medicoExistente.getUsuario().setEmail(dadosAtualizados.getUsuario().getEmail());
+            }
+
+            medicoRepository.save(medicoExistente);
+            return ResponseEntity.ok(medicoExistente);
+
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> excluir(@PathVariable UUID id) {
-        // Apaga o médico pelo ID
-        medicoRepository.deleteById(id);
-        return ResponseEntity.ok().body("Médico removido com sucesso!");
+    public ResponseEntity<?> excluirMedico(@PathVariable UUID id) {
+        // 1. Pega o médico pelo ID
+        var medico = medicoRepository.getReferenceById(id);
+
+        // 2. Carimba como inativo (ativo = false)
+        medico.inativar();
+
+        // 3. Devolve sucesso para o Angular
+        return ResponseEntity.noContent().build();
     }
 }

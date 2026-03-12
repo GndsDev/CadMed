@@ -39,6 +39,7 @@ public class AgendamentoController {
         Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
 
         // 2. Se for um MÉDICO, o cofre só abre a gaveta dele!
+        assert usuarioLogado != null;
         if (usuarioLogado.getRole() == UserRole.MEDICO) {
 
             // Encontra qual é o perfil de médico ligado a este login

@@ -35,4 +35,10 @@ public class Paciente {
     public String getEmail() {
         return this.usuario != null ? this.usuario.getEmail() : "";
     }
+
+    private Boolean ativo = true;
+
+    public void inativar() {
+        this.ativo = false;
+    }
 }

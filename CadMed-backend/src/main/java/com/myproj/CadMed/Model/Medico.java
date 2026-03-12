@@ -35,4 +35,11 @@ public class Medico {
     public String getEmail() {
         return this.usuario != null ? this.usuario.getEmail() : "";
     }
+
+    private Boolean ativo = true;
+
+    // 2. Adicione este método lá no final da classe
+    public void inativar() {
+        this.ativo = false;
+    }
 }

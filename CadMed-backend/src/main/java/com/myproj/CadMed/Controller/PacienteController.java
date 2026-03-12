@@ -52,17 +52,50 @@ public class PacienteController {
     // --- MÉTODOS NOVOS ADICIONADOS AQUI ---
 
     @GetMapping
-    public ResponseEntity<List<Paciente>> listar() {
-        // Vai à base de dados buscar todos os pacientes e envia para o Angular
-        return ResponseEntity.ok(pacienteRepository.findAll());
+    public ResponseEntity<List<Paciente>> listarTodos() {
+        // Agora só devolve quem tem a flag ativo = true
+        return ResponseEntity.ok(pacienteRepository.findAllByAtivoTrue());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Paciente> buscarPorId(@PathVariable UUID id) {
+        return pacienteRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> atualizarPaciente(@PathVariable UUID id, @RequestBody Paciente dadosAtualizados) {
+        return pacienteRepository.findById(id).map(pacienteExistente -> {
+
+            // 1. Atualiza os dados do Paciente
+            pacienteExistente.setNome(dadosAtualizados.getNome());
+            pacienteExistente.setCpf(dadosAtualizados.getCpf());
+            pacienteExistente.setTelefone(dadosAtualizados.getTelefone());
+
+            if (pacienteExistente.getUsuario() != null && dadosAtualizados.getUsuario() != null) {
+                pacienteExistente.getUsuario().setEmail(dadosAtualizados.getUsuario().getEmail());
+            }
+
+            // 2. Salva e devolve o paciente atualizado
+            pacienteRepository.save(pacienteExistente);
+            return ResponseEntity.ok(pacienteExistente);
+
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> excluir(@PathVariable UUID id) {
-        // Apaga o paciente pelo ID
-        pacienteRepository.deleteById(id);
-        return ResponseEntity.ok().body("Paciente removido com sucesso!");
+    public ResponseEntity<?> excluirPaciente(@PathVariable UUID id) {
+        // Vai buscar o paciente ao banco de dados
+        var paciente = pacienteRepository.getReferenceById(id);
+
+        // Em vez de deleteById, chamamos o método que muda para false
+        paciente.inativar();
+
+        // Retorna sucesso para o Angular (o Angular vai achar que foi apagado!)
+        return ResponseEntity.noContent().build();
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
 import java.util.List;
 
 @Configuration
@@ -45,11 +44,15 @@ public class SecurityConfigurations {
                         // Rotas de Pacientes
                         .requestMatchers(HttpMethod.POST, "/api/pacientes").hasRole("SECRETARIA") // Permite que pacientes se registem sozinhos
                         .requestMatchers(HttpMethod.GET, "/api/pacientes").hasRole("SECRETARIA") // Apenas Secretaria lista pacientes
-                        .requestMatchers(HttpMethod.DELETE, "/api/pacientes/**").hasRole("SECRETARIA") // Apenas Secretaria remove pacientes
+                        .requestMatchers(HttpMethod.GET, "/api/pacientes/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/pacientes/**").hasRole("SECRETARIA") // <-- ADICIONADO: Permite Secretaria editar pacientes
+                        .requestMatchers(HttpMethod.DELETE, "/api/pacientes/**").authenticated() // Apenas Secretaria remove pacientes
 
                         // Rotas de Médicos
                         .requestMatchers(HttpMethod.POST, "/api/medicos").hasRole("SECRETARIA") // Apenas Secretaria regista médicos
                         .requestMatchers(HttpMethod.GET, "/api/medicos").hasRole("SECRETARIA") // Apenas Secretaria lista médicos
+                        .requestMatchers(HttpMethod.GET, "/api/medicos/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/medicos/**").hasRole("SECRETARIA") // <-- ADICIONADO: Permite Secretaria editar médicos
                         .requestMatchers(HttpMethod.DELETE, "/api/medicos/**").hasRole("SECRETARIA") // Apenas Secretaria remove médicos
 
                         // Rotas de Agendamentos
@@ -70,7 +73,7 @@ public class SecurityConfigurations {
         CorsConfiguration configuration = new CorsConfiguration();
         // Define as origens permitidas (Localhost e IP de Produção)
         configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://34.31.241.110"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET","PATCH", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
@@ -88,6 +91,5 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
 }

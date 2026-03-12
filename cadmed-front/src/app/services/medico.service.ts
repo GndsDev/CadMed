@@ -26,4 +26,13 @@ export class MedicoService {
   excluir(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
+
+  buscarPorId(id: string) {
+    return this.http.get(`${this.apiUrl}/${id}`);
+  }
+
+  // Para salvar as edições
+  atualizar(id: string, dados: any) {
+    return this.http.put(`${this.apiUrl}/${id}`, dados);
+  }
 }

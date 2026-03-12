@@ -1,0 +1,168 @@
+/* ESTRUTURA GERAL */
+.form-section {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 800px; /* Mais estreito que a tabela, para focar na leitura */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+}
+
+/* CABEÇALHO */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.header-titles h2 {
+  margin: 0 0 8px 0;
+  color: #2b3445;
+  font-weight: 700;
+}
+
+.text-muted {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.95em;
+}
+
+.btn-voltar {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-voltar:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* GRID DO FORMULÁRIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Duas colunas */
+  gap: 20px;
+}
+
+.span-2 {
+  grid-column: span 2; /* Ocupa a linha toda */
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+/* INPUTS MODERNOS COM ÍCONES */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #9ca3af;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 12px 14px 12px 40px; /* Espaço extra à esquerda para o ícone */
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95em;
+  color: #1f2937;
+  transition: all 0.2s;
+  background: #f9fafb;
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: #3b82f6; /* Azul primário */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: white;
+}
+
+/* ALERTA DE SENHA */
+.info-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f0f9ff;
+  border-left: 4px solid #0ea5e9;
+  padding: 15px;
+  border-radius: 6px;
+  color: #0369a1;
+  font-size: 0.9em;
+}
+
+/* RODAPÉ E BOTÕES */
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 30px 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.btn {
+  padding: 10px 24px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* RESPONSIVIDADE (Celular) */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* Volta para 1 coluna no telemóvel */
+  }
+  .span-2 {
+    grid-column: span 1;
+  }
+}
