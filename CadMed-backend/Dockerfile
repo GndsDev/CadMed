@@ -1,15 +1,28 @@
-# 1. Qual é o sistema base? (Um Linux ultra-leve com Java 17 instalado)
-# Se você estiver usando o Java 21, mude o '17' para '21' na linha abaixo
-FROM eclipse-temurin:25-jdk-alpine
-
-# 2. Cria uma pasta chamada /app dentro do contêiner
+# ==========================================
+# FASE 1: Construção (Gerar o .jar/snapshot)
+# ==========================================
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# 3. Copia o seu arquivo .jar que o Maven gerou para dentro do contêiner
-COPY target/*.jar app.jar
+# Copia o arquivo de dependências primeiro
+COPY pom.xml .
+# Copia todo o código fonte
+COPY src ./src
 
-# 4. Avisa que este contêiner vai se comunicar pela porta 8080
+# Pede pro Maven gerar o arquivo .jar (ignorando os testes)
+RUN mvn clean package -DskipTests
+
+# ==========================================
+# FASE 2: Execução (Rodar o projeto)
+# ==========================================
+FROM eclipse-temurin:25-jre
+WORKDIR /app
+
+# Copia APENAS o .jar gerado na Fase 1 para esta imagem final
+COPY --from=build /app/target/*.jar app.jar
+
+# Expõe a porta que o Spring Boot usa
 EXPOSE 8080
 
-# 5. O comando mágico que o Docker vai rodar quando o contêiner ligar
+# Comando para rodar o seu sistema
 ENTRYPOINT ["java", "-jar", "app.jar"]
