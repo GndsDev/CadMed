@@ -10,7 +10,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Pede pro Maven gerar o arquivo .jar (ignorando os testes)
-RUN mvn clean package -DskipTests
+RUN mvn -B clean package -DskipTests -Dhttps.protocols=TLSv1.2,TLSv1.3 -Dmaven.wagon.http.retryHandler.count=3
 
 # ==========================================
 # FASE 2: Execução (Rodar o projeto)
