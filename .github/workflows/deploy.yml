@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.GCP_IP }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_KEY }}
+          timeout: 30m
           script: |
             sudo -u gabrielnunesdossantoss bash -c 'cd /home/gabrielnunesdossantoss/CadMed && git pull origin main'
             sudo bash -c 'cd /home/gabrielnunesdossantoss/CadMed && docker compose build --no-cache && docker compose up -d --force-recreate'
