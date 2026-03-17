@@ -41,6 +41,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
+
                         // Rotas de Pacientes
                         .requestMatchers(HttpMethod.POST, "/api/pacientes").hasRole("SECRETARIA") // Permite que pacientes se registem sozinhos
                         .requestMatchers(HttpMethod.GET, "/api/pacientes").hasRole("SECRETARIA") // Apenas Secretaria lista pacientes
@@ -71,8 +72,8 @@ public class SecurityConfigurations {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Define as origens permitidas (Localhost e IP de Produção)
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://34.31.241.110"));
+        // Define as origens permitidas (Localhost de dev, containerizado e IP de Produção)
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost", "http://34.31.241.110"));
         configuration.setAllowedMethods(Arrays.asList("GET","PATCH", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://34.31.241.110' // Aqui vai o IP do Google Cloud sem a porta 8080!
+  apiUrl: 'http://localhost:8080' // Backend Spring Boot em localhost:8080 (ajuste para o IP/host de produção conforme necessário)
 };

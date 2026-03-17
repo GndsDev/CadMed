@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://34.31.241.110' // Aqui sim vai o localhost!
+  apiUrl: 'http://localhost:8080' // Backend Spring Boot em localhost:8080
 };
