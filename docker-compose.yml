@@ -14,8 +14,7 @@ services:
 
   # 2. O SEU BACK-END (Spring Boot)
   backend:
-    build: 
-      context: ./CadMed-backend
+    image: gndsdev/cadmed-backend:latest
     container_name: cadmed-backend
     restart: on-failure
     ports:
@@ -36,8 +35,7 @@ services:
 
   # 3. O SEU FRONT-END (Angular + Nginx)
   frontend:
-    build: 
-      context: ./cadmed-front # Nome da pasta onde está o Angular
+    image: gndsdev/cadmed-front:latest
     container_name: cadmed-frontend
     ports:
       - "80:80" # Continua abrindo no localhost:4200 para você, mas por baixo dos panos bate no Nginx (80)
