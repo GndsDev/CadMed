@@ -1,27 +1,72 @@
-<div style="max-width: 1000px; margin: 0 auto;">
-  <div class="card-header" style="text-align: center; margin-bottom: 3rem;">
+<div style="max-width: 1000px; margin: 0 auto; padding-bottom: 2rem;">
+
+  <div class="card-header" style="text-align: center; margin-bottom: 2rem;">
     <h2 class="gradient-text" style="font-size: 2.5rem;">Bem-vindo ao CadMed</h2>
-    <p class="header-desc" *ngIf="isSecretaria()">Selecione uma das opções abaixo para gerir a clínica.</p>
-    <p class="header-desc" *ngIf="isMedico()">Acesse sua agenda e pacientes abaixo.</p>
+    <p class="header-desc" *ngIf="isSecretaria()">Visão geral e estatísticas da clínica.</p>
+    <p class="header-desc" *ngIf="isMedico()">Resumo diário e acesso rápido aos seus pacientes.</p>
+  </div>
+
+  <div *ngIf="carregando" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+    <h3 style="font-size: 1.5rem;">⏳ A calcular estatísticas...</h3>
+  </div>
+
+  <div *ngIf="!carregando" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+
+    <div class="glass-card" style="text-align: center; border-bottom: 4px solid #3b82f6;">
+      <div style="font-size: 3rem; color: #3b82f6; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;">
+        {{ resumo.consultasHoje }}
+      </div>
+      <h4 style="margin: 0; color: var(--text-color);">Consultas Hoje</h4>
+      <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Agendadas no sistema</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center; border-bottom: 4px solid #10b981;">
+      <div style="font-size: 3rem; color: #10b981; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;">
+        {{ resumo.consultasConcluidas }}
+      </div>
+      <h4 style="margin: 0; color: var(--text-color);">Atendimentos</h4>
+      <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Total de consultas concluídas</p>
+    </div>
+
+    <div class="glass-card" style="text-align: center; border-bottom: 4px solid #f59e0b;">
+      <div style="font-size: 3rem; color: #f59e0b; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;">
+        {{ resumo.totalPacientes }}
+      </div>
+      <h4 style="margin: 0; color: var(--text-color);">Pacientes Ativos</h4>
+      <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Registos na base de dados</p>
+    </div>
+
+    <div class="glass-card" *ngIf="isSecretaria()" style="text-align: center; border-bottom: 4px solid #8b5cf6;">
+      <div style="font-size: 3rem; color: #8b5cf6; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;">
+        {{ resumo.totalMedicos }}
+      </div>
+      <h4 style="margin: 0; color: var(--text-color);">Corpo Clínico</h4>
+      <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Médicos ativos na clínica</p>
+    </div>
+
+  </div>
+
+  <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+    <h3 style="color: var(--text-color); margin: 0;">Acesso Rápido</h3>
   </div>
 
   <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
 
-    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/agenda">
+    <div class="glass-card" style="cursor: pointer; text-align: center; transition: transform 0.2s;" routerLink="/agenda" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
       <div style="font-size: 3.5rem; margin-bottom: 1rem;">📅</div>
       <h3>Agenda de Consultas</h3>
       <p class="header-desc" *ngIf="isSecretaria()">Marque e visualize os horários dos médicos.</p>
       <p class="header-desc" *ngIf="isMedico()">Visualize suas consultas agendadas.</p>
     </div>
 
-    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/pacientes">
+    <div class="glass-card" style="cursor: pointer; text-align: center; transition: transform 0.2s;" routerLink="/pacientes" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
       <div style="font-size: 3.5rem; margin-bottom: 1rem;">👥</div>
       <h3>Gestão de Pacientes</h3>
       <p class="header-desc" *ngIf="isSecretaria()">Listar, registar e editar dados de pacientes.</p>
       <p class="header-desc" *ngIf="isMedico()">Visualize os seus pacientes.</p>
     </div>
 
-    <div class="glass-card" style="cursor: pointer; text-align: center;" routerLink="/medicos" *ngIf="isSecretaria()">
+    <div class="glass-card" style="cursor: pointer; text-align: center; transition: transform 0.2s;" routerLink="/medicos" *ngIf="isSecretaria()" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
       <div style="font-size: 3.5rem; margin-bottom: 1rem;">👨‍⚕️</div>
       <h3>Corpo Clínico</h3>
       <p class="header-desc">Administre os profissionais de saúde da unidade.</p>

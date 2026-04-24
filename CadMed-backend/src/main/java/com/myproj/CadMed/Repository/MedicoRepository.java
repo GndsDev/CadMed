@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface MedicoRepository extends JpaRepository<Medico, UUID> {
     Optional<Medico> findByUsuarioId(UUID usuarioId);
     List<Medico> findAllByAtivoTrue();
+    long countByAtivoTrue(); // Conta apenas os médicos ativos
 }

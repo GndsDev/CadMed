@@ -62,6 +62,12 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.DELETE, "/api/agendamentos/**").authenticated() // Cancelamento via Secretaria
                         .requestMatchers(HttpMethod.PATCH, "/api/agendamentos/*/status").authenticated()
 
+                        // Rotas de Prontuários (O coração da consulta)
+                        .requestMatchers(HttpMethod.POST, "/api/prontuarios").hasRole("MEDICO")
+
+                        // Rota do Dashboard (Qualquer pessoa logada pode ver)
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/**").authenticated()
+
                         // Todas as outras rotas exigem autenticação genérica
                         .anyRequest().authenticated()
                 )

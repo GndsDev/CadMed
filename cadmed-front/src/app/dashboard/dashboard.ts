@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { BreadcrumbService, BreadcrumbItem } from '../services/breadcrumb.service';
 import { AuthService } from '../services/auth.service';
-import { UserRole } from '../models/auth';
+import { DashboardService } from '../services/dashboard.service'; // <-- Importamos o nosso novo serviço
 
 @Component({
   selector: 'app-dashboard',
@@ -14,16 +13,42 @@ import { UserRole } from '../models/auth';
 })
 export class DashboardComponent implements OnInit {
 
+  // Variáveis para guardar os números do Back-end
+  resumo: any = {
+    totalPacientes: 0,
+    totalMedicos: 0,
+    consultasHoje: 0,
+    consultasConcluidas: 0
+  };
+
+  carregando = true; // Controla o "A carregar..." na tela
+
   constructor(
-    private breadcrumbService: BreadcrumbService,
-    public authService: AuthService
+    public authService: AuthService,
+    private dashboardService: DashboardService // <-- Injetamos o serviço aqui
   ) {}
 
-  ngOnInit() {
-    console.log('Dashboard carregado com sucesso!');
-    this.breadcrumbService.set([
-      { label: 'Dashboard', url: '/dashboard' }
-    ]);
+  // No dashboard.ts
+ngOnInit() {
+  this.carregando = true; // Força o estado de carregamento inicial
+  setTimeout(() => {
+    this.carregarResumo();
+  }, 500); // 500ms é o tempo de "segurança"
+}
+
+  // Função que vai ao Java buscar a estatística
+  carregarResumo() {
+    this.carregando = true;
+    this.dashboardService.getResumo().subscribe({
+      next: (dados) => {
+        this.resumo = dados;
+        this.carregando = false;
+      },
+      error: (e) => {
+        console.error('Erro ao carregar os dados do dashboard', e);
+        this.carregando = false; // Paramos o carregamento mesmo se der erro
+      }
+    });
   }
 
   isMedico(): boolean {

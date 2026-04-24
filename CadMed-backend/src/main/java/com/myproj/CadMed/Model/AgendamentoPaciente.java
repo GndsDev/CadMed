@@ -38,4 +38,7 @@ public class AgendamentoPaciente {
 
     @Enumerated(EnumType.STRING)
     private StatusAgendamento status;
+
+    @OneToOne(mappedBy = "agendamento", cascade = CascadeType.ALL)
+    private Prontuario prontuario;
 }

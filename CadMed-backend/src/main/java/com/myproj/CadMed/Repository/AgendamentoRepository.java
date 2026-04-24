@@ -1,7 +1,9 @@
 package com.myproj.CadMed.Repository;
 
 import com.myproj.CadMed.Model.AgendamentoPaciente;
+import com.myproj.CadMed.Model.StatusAgendamento;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -15,4 +17,9 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoPaciente
     boolean existsByPacienteIdAndDataHora(UUID uuid, LocalDateTime localDateTime);
 
     List<AgendamentoPaciente> findByMedicoId(UUID medicoId);
+
+    long countByStatus(StatusAgendamento status);
+
+    @Query("SELECT COUNT(a) FROM Agendamento a WHERE DATE(a.dataHora) = CURRENT_DATE")
+    long countConsultasHoje();
 }

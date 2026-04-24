@@ -20,7 +20,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/agendamentos")
+@CrossOrigin("*")
 public class AgendamentoController {
+
+    @Autowired
+    private com.myproj.CadMed.Service.EmailService emailService;
 
     @Autowired
     private AgendamentoRepository agendamentoRepository;
@@ -73,6 +77,12 @@ public class AgendamentoController {
         novoAgendamento.setStatus(StatusAgendamento.AGENDADO);
 
         agendamentoRepository.save(novoAgendamento);
+        emailService.enviarEmailConfirmacao(
+                paciente.getEmail(), // Garanta que o modelo Paciente tem um campo email!
+                paciente.getNome(),
+                novoAgendamento.getDataHora().toString(),
+                medico.getNome()
+        );
         return ResponseEntity.ok().body(Map.of("mensagem", "Consulta agendada com sucesso!"));
     }
 

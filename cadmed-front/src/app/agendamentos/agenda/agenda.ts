@@ -6,6 +6,7 @@ import { PacienteService } from '../../services/paciente.service';
 import { MedicoService } from '../../services/medico.service';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { AuthService } from '../../services/auth.service';
+import { ProntuarioService } from '../../services/prontuario.service';
 
 @Component({
   selector: 'app-agenda',
@@ -22,13 +23,18 @@ export class AgendaComponent implements OnInit {
 
   formAgenda = { pacienteId: '', medicoId: '', data: '', hora: '', observacoes: '' };
 
+  agendamentoEmAtendimento: any = null;
+
+  formProntuario = { sintomas: '', diagnostico: '', prescricaoMedica: '', observacoes: '' };
+
   constructor(
     private agendamentoService: AgendamentoService,
     private pacienteService: PacienteService,
     private medicoService: MedicoService,
     private breadcrumbService: BreadcrumbService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private prontuarioService: ProntuarioService
   ) {}
 
   ngOnInit() {
@@ -117,5 +123,40 @@ export class AgendaComponent implements OnInit {
     const data = partes[0].split('-').reverse().join('/'); // Ex: 20-05-2024
     const hora = partes[1].substring(0, 5); // Ex: 14:30
     return `${data} às ${hora}`;
+  }
+
+iniciarAtendimento(agendamento: any) {
+    this.agendamentoEmAtendimento = agendamento;
+    // Limpa o formulário caso ele tenha atendido outro paciente antes
+    this.formProntuario = { sintomas: '', diagnostico: '', prescricaoMedica: '', observacoes: '' };
+  }
+
+  cancelarAtendimento() {
+    this.agendamentoEmAtendimento = null;
+  }
+
+  salvarProntuario() {
+    this.carregando = true;
+
+    const payload = {
+      agendamentoId: this.agendamentoEmAtendimento.id,
+      sintomas: this.formProntuario.sintomas,
+      diagnostico: this.formProntuario.diagnostico,
+      prescricaoMedica: this.formProntuario.prescricaoMedica,
+      observacoes: this.formProntuario.observacoes
+    };
+
+    this.prontuarioService.registrar(payload).subscribe({
+      next: () => {
+        alert('Prontuário salvo com sucesso! A consulta foi finalizada.');
+        this.agendamentoEmAtendimento = null; // Fecha o formulário
+        this.carregarAgendamentos(); // Recarrega a tabela para vermos o status "CONCLUIDO"
+      },
+      error: (e) => {
+        console.error('Erro ao salvar prontuário', e);
+        alert('Erro ao salvar o prontuário. Verifique a consola.');
+        this.carregando = false;
+      }
+    });
   }
 }
