@@ -10,6 +10,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.authService.getToken();
+    // LOG DE DEPURAÇÃO:
+    console.log(`[INTERCEPTOR] Indo para: ${request.url} | Token encontrado: ${token ? '✅ SIM' : '❌ NÃO'}`);
 
     // Se tivermos um token guardado, nós clonamos a requisição e adicionamos o cabeçalho
     if (token) {

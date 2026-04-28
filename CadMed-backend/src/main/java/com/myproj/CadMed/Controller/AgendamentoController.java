@@ -39,7 +39,7 @@ public class AgendamentoController {
     @GetMapping
 
     public ResponseEntity<List<AgendamentoPaciente>> listar(Authentication authentication) {
-        // 1. Descobre quem é a pessoa que está logada neste momento
+        // 1. Descobre quem é a pessoa que está logada neste momentomy
         Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
 
         // 2. Se for um MÉDICO, o cofre só abre a gaveta dele!
@@ -60,10 +60,12 @@ public class AgendamentoController {
         return ResponseEntity.ok(todasAsConsultas);
     }
 
+
     // 2. CRIAR CONSULTA (Apenas Secretária vai ter o botão no Angular)
     @PostMapping
     @Transactional
     public ResponseEntity<?> agendar(@RequestBody DadosAgendamento dados) {
+
         var medico = medicoRepository.findById(dados.medicoId())
                 .orElseThrow(() -> new RuntimeException("Médico não encontrado!"));
 
@@ -76,13 +78,22 @@ public class AgendamentoController {
         novoAgendamento.setDataHora(dados.dataHora());
         novoAgendamento.setStatus(StatusAgendamento.AGENDADO);
 
+        // Salva a consulta no banco de dados primeiro
         agendamentoRepository.save(novoAgendamento);
-        emailService.enviarEmailConfirmacao(
-                paciente.getEmail(), // Garanta que o modelo Paciente tem um campo email!
-                paciente.getNome(),
-                novoAgendamento.getDataHora().toString(),
-                medico.getNome()
-        );
+
+        // Tenta enviar o e-mail, mas não cancela o agendamento se houver bloqueio de rede
+        try {
+            emailService.enviarEmailConfirmacao(
+                    paciente.getEmail(),
+                    paciente.getNome(),
+                    novoAgendamento.getDataHora().toString(),
+                    medico.getNome()
+            );
+        } catch (Exception e) {
+            // Log mínimo de erro apenas para não falhar silenciosamente no terminal
+            System.err.println("Aviso: Falha ao enviar e-mail - " + e.getMessage());
+        }
+
         return ResponseEntity.ok().body(Map.of("mensagem", "Consulta agendada com sucesso!"));
     }
 
