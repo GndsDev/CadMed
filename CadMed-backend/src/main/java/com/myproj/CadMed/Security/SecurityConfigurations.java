@@ -68,6 +68,8 @@ public class SecurityConfigurations {
                         // Rota do Dashboard (Qualquer pessoa logada pode ver)
                         .requestMatchers(HttpMethod.GET, "/api/dashboard/**").authenticated()
 
+                        .requestMatchers(HttpMethod.POST, "/api/pagamentos").hasRole("SECRETARIA") // ou apenas .authenticated()
+
                         // Todas as outras rotas exigem autenticação genérica
                         .anyRequest().authenticated()
                 )

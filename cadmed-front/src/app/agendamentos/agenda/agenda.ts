@@ -7,6 +7,8 @@ import { MedicoService } from '../../services/medico.service';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { AuthService } from '../../services/auth.service';
 import { ProntuarioService } from '../../services/prontuario.service';
+import { ToastService } from '../../services/toast.service';
+import { PagamentoService } from '../../services/pagamento.service';
 
 @Component({
   selector: 'app-agenda',
@@ -27,6 +29,10 @@ export class AgendaComponent implements OnInit {
 
   formProntuario = { sintomas: '', diagnostico: '', prescricaoMedica: '', observacoes: '' };
 
+  agendamentoParaCobrar: any = null;
+
+  formPagamento = { valor: null, metodoPagamento: '' };
+
   constructor(
     private agendamentoService: AgendamentoService,
     private pacienteService: PacienteService,
@@ -34,7 +40,9 @@ export class AgendaComponent implements OnInit {
     private breadcrumbService: BreadcrumbService,
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private prontuarioService: ProntuarioService
+    private prontuarioService: ProntuarioService,
+    private toastService: ToastService,
+    private pagamentoService: PagamentoService
   ) {}
 
   ngOnInit() {
@@ -91,7 +99,7 @@ export class AgendaComponent implements OnInit {
 
     this.agendamentoService.agendar(payload).subscribe({
       next: () => {
-        alert('Consulta agendada com sucesso!');
+        this.toastService.show('Consulta agendada com sucesso!');
         this.formAgenda = { pacienteId: '', medicoId: '', data: '', hora: '', observacoes: '' };
         this.carregarAgendamentos(); // Recarrega a tabela!
       },
@@ -109,10 +117,23 @@ export class AgendaComponent implements OnInit {
   }
 
   cancelar(id: string) {
-    if(confirm('Tem a certeza que deseja cancelar esta consulta?')) {
+    if (confirm('Tem certeza que deseja cancelar esta consulta? A ação não pode ser desfeita.')) {
+
+      // NOTA: Se no seu agendamento.service.ts a função se chama 'excluir', mude aqui para 'excluir(id)'
       this.agendamentoService.excluir(id).subscribe({
-        next: () => this.carregarAgendamentos(),
-        error: (e) => console.error('Erro ao cancelar', e)
+        next: () => {
+          // UX de Ouro: Encontra a consulta na memória e muda o status para a tag ficar vermelha na hora!
+          const consultaCancelada = this.agendamentos.find(ag => ag.id === id);
+          if (consultaCancelada) {
+            consultaCancelada.status = 'CANCELADO';
+          }
+
+          this.toastService.show('Consulta cancelada com sucesso!');
+        },
+        error: (erro: any) => {
+          console.error('Erro ao cancelar a consulta:', erro);
+          this.toastService.show('Não foi possível cancelar a consulta. Verifique o console.');
+        }
       });
     }
   }
@@ -148,14 +169,55 @@ iniciarAtendimento(agendamento: any) {
 
     this.prontuarioService.registrar(payload).subscribe({
       next: () => {
-        alert('Prontuário salvo com sucesso! A consulta foi finalizada.');
+        this.toastService.show('Prontuário salvo com sucesso! A consulta foi finalizada.');
         this.agendamentoEmAtendimento = null; // Fecha o formulário
         this.carregarAgendamentos(); // Recarrega a tabela para vermos o status "CONCLUIDO"
       },
       error: (e) => {
         console.error('Erro ao salvar prontuário', e);
-        alert('Erro ao salvar o prontuário. Verifique a consola.');
+        this.toastService.show('Erro ao salvar o prontuário. Verifique a consola.');
         this.carregando = false;
+      }
+    });
+  }
+  abrirCobranca(agendamento: any) {
+    this.agendamentoParaCobrar = agendamento;
+    this.formPagamento = { valor: null, metodoPagamento: '' };
+    // Dica de UX: Rola a página suavemente até ao formulário
+    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+  }
+
+  cancelarCobranca() {
+    this.agendamentoParaCobrar = null;
+  }
+
+  salvarPagamento() {
+    this.carregando = true;
+    const payload = {
+      agendamentoId: this.agendamentoParaCobrar.id,
+      valor: this.formPagamento.valor,
+      metodoPagamento: this.formPagamento.metodoPagamento
+    };
+
+    this.pagamentoService.registrar(payload).subscribe({
+      next: () => {
+        this.toastService.show('Pagamento registado com sucesso!', 'success');
+
+        // A MÁGICA: Atualiza o status na memória para sumir com o botão e mudar a cor da tag!
+        const consultaPaga = this.agendamentos.find(ag => ag.id === this.agendamentoParaCobrar.id);
+        if (consultaPaga) {
+          consultaPaga.status = 'PAGO';
+        }
+
+        this.agendamentoParaCobrar = null; // Fecha o formulário
+        this.carregando = false;
+        this.cdr.detectChanges(); // Obriga a tela a atualizar na hora
+      },
+      error: (e) => {
+        console.error('Erro ao registar pagamento', e);
+        this.toastService.show('Erro ao processar o pagamento.', 'error');
+        this.carregando = false;
+        this.cdr.detectChanges();
       }
     });
   }

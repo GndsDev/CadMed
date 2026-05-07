@@ -43,9 +43,25 @@
       <h4 style="margin: 0; color: var(--text-color);">Corpo Clínico</h4>
       <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Médicos ativos na clínica</p>
     </div>
+    <div class="glass-card" *ngIf="isSecretaria()" style="text-align: center; border-bottom: 4px solid #14b8a6;">
+      <div style="font-size: 2.5rem; color: #14b8a6; font-weight: bold; margin-bottom: 0.5rem; line-height: 1;">
+        {{ resumo.faturamentoHoje | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <h4 style="margin: 0; color: var(--text-color);">Faturamento Hoje</h4>
+      <p class="header-desc" style="font-size: 0.85rem; margin-top: 0.5rem;">Recebimentos confirmados</p>
+    </div>
 
   </div>
 
+  <div class="glass-card" *ngIf="!carregando" style="margin-bottom: 3rem;">
+    <div class="card-header" style="margin-bottom: 1rem;">
+      <h3 style="margin: 0;">📈 Visão Geral de Atendimentos</h3>
+      <p class="header-desc">Métricas consolidadas da clínica em tempo real.</p>
+    </div>
+    <div style="position: relative; height: 350px; width: 100%; padding: 1rem;">
+      <canvas id="meuGrafico"></canvas>
+    </div>
+  </div>
   <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
     <h3 style="color: var(--text-color); margin: 0;">Acesso Rápido</h3>
   </div>

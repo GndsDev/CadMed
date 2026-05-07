@@ -9,6 +9,7 @@ export class AgendamentoService {
 
   constructor(private http: HttpClient) { }
 
+
   listar(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }

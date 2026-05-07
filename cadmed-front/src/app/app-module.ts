@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common'; // <-- NECESSÁRIO PARA ngClass, ngIf, ngFor
 import { RouterModule } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ToastComponent } from './components/toast/toast';
 
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AppComponent } from './app';
@@ -21,7 +22,8 @@ import { BreadcrumbComponent } from './components/breadcrumb';
     FormsModule,     // Necessário para ngModel
     CommonModule,    // Necessário para ngClass, ngIf
     RouterModule.forRoot(routes),
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    ToastComponent
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
