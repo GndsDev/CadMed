@@ -2,6 +2,7 @@ package com.myproj.CadMed.Controller;
 
 import com.myproj.CadMed.DTO.DashboardResumoDTO;
 import com.myproj.CadMed.Model.StatusAgendamento;
+import com.myproj.CadMed.Model.StatusPagamento;
 import com.myproj.CadMed.Repository.AgendamentoRepository;
 import com.myproj.CadMed.Repository.MedicoRepository;
 import com.myproj.CadMed.Repository.PacienteRepository;
@@ -39,17 +40,29 @@ public class DashboardController {
         long consultasHoje = agendamentoRepository.countConsultasHoje();
         long consultasConcluidas = agendamentoRepository.countByStatus(StatusAgendamento.CONCLUIDO);
 
+
+        BigDecimal faturamentoHoje = BigDecimal.ZERO;
+
+
+        try {
+            BigDecimal faturamentoBD = pagamentoRepository.calcularFaturamentoHoje(StatusPagamento.PAGO);
+
+            if (faturamentoBD != null) {
+                faturamentoHoje = faturamentoBD;
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao calcular faturamento (Dashboard): " + e.getMessage());
+
+        }
+
+
         DashboardResumoDTO resumo = new DashboardResumoDTO(
                 totalPacientes,
                 totalMedicos,
                 consultasHoje,
-                consultasConcluidas
+                consultasConcluidas,
+                faturamentoHoje
         );
-
-        BigDecimal faturamentoHoje = pagamentoRepository.calcularFaturamentoHoje();
-        if (faturamentoHoje == null) {
-            faturamentoHoje = BigDecimal.ZERO;
-        }
 
         return ResponseEntity.ok(resumo);
     }
