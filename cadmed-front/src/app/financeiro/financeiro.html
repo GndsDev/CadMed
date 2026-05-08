@@ -1,0 +1,68 @@
+<div style="max-width: 1000px; margin: 0 auto; padding-bottom: 3rem;">
+
+  <div class="card-header" style="text-align: center; margin-bottom: 3rem;">
+    <h2 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 0.5rem;">Relatório Financeiro</h2>
+    <p class="header-desc">Acompanhamento anual de faturamento e histórico de recebimentos.</p>
+  </div>
+
+  <div *ngIf="carregando" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+    <h3 style="font-size: 1.5rem;">⏳ A processar dados financeiros...</h3>
+  </div>
+
+  <div *ngIf="!carregando">
+
+    <div class="glass-card" style="margin-bottom: 3rem; padding: 2rem;">
+      <h3 style="margin-bottom: 1.5rem; color: var(--text-color); font-size: 1.2rem;">Evolução do Faturamento (Ano Atual)</h3>
+      <div style="position: relative; height: 300px; width: 100%;">
+        <canvas id="graficoFaturamento"></canvas>
+      </div>
+    </div>
+
+    <div class="glass-card" style="padding: 2rem;">
+      <h3 style="margin-bottom: 1.5rem; color: var(--text-color); font-size: 1.2rem;">Auditoria de Recebimentos</h3>
+
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 1rem;">Data e Hora</th>
+              <th style="padding: 1rem;">Método</th>
+              <th style="padding: 1rem;">Valor</th>
+              <th style="padding: 1rem; text-align: center;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pag of historicoPagamentos" style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.02)'" onmouseout="this.style.backgroundColor='transparent'">
+
+              <td style="padding: 1rem; color: var(--text-color);">
+                {{ pag.dataPagamento | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td style="padding: 1rem; color: var(--text-muted);">
+                {{ pag.metodoPagamento }}
+              </td>
+
+              <td style="padding: 1rem; font-weight: bold; color: #10b981;">
+                {{ pag.valor | currency:'BRL':'symbol':'1.2-2' }}
+              </td>
+
+              <td style="padding: 1rem; text-align: center;">
+                <span style="background-color: #d1fae5; color: #065f46; padding: 0.3rem 0.8rem; border-radius: 99px; font-size: 0.85rem; font-weight: bold;">
+                  {{ pag.status }}
+                </span>
+              </td>
+
+            </tr>
+
+            <tr *ngIf="historicoPagamentos.length === 0">
+              <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                Nenhum faturamento registado ainda.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

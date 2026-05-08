@@ -8,10 +8,13 @@ import { MedicoListComponent } from './medicos/medico-list/medico-list';
 import { DashboardComponent } from './dashboard/dashboard';
 import { RoleGuard } from './guards/role.guard';
 import { UserRole } from './models/auth';
+import { FinanceiroComponent } from './financeiro/financeiro';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent }, // <-- ROTA DO LOGIN
+  { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'financeiro', component: FinanceiroComponent },
+
   {
     path: 'medicos/novo',
     component: MedicoFormComponent,

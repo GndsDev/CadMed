@@ -70,6 +70,8 @@ public class SecurityConfigurations {
 
                         .requestMatchers(HttpMethod.POST, "/api/pagamentos").hasRole("SECRETARIA") // ou apenas .authenticated()
 
+                        .requestMatchers(HttpMethod.GET, "/api/financeiro/**").hasRole("SECRETARIA")
+
                         // Todas as outras rotas exigem autenticação genérica
                         .anyRequest().authenticated()
                 )

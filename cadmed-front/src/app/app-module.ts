@@ -11,10 +11,13 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AppComponent } from './app';
 import { routes } from './app.routes';
 import { BreadcrumbComponent } from './components/breadcrumb';
+import { FinanceiroComponent } from './financeiro/financeiro';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    FinanceiroComponent
   ],
   imports: [
     BrowserModule,

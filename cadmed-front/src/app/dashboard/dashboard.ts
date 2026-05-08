@@ -69,49 +69,36 @@ export class DashboardComponent implements OnInit {
 
   // 4. A função que constrói o visual do gráfico de barras
   renderizarGrafico() {
-    // Se já houver um gráfico desenhado, destruímos antes de criar o novo (evita bugar a tela)
+    const canvas = document.getElementById('meuGrafico') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    // Se já existir um gráfico, destrói antes de criar outro (evita bugs de sobreposição)
     if (this.grafico) {
       this.grafico.destroy();
     }
 
-    const canvas = document.getElementById('meuGrafico') as HTMLCanvasElement;
-    if (!canvas) return; // Proteção: se o HTML ainda não tiver o canvas, cancela.
-
     this.grafico = new Chart(canvas, {
-      type: 'bar', // Tipo do gráfico
+      type: 'doughnut', // Aqui está a mágica: mudou de 'bar' para 'doughnut' (rosca)
       data: {
-        labels: ['Consultas Hoje', 'Atendimentos', 'Pacientes Ativos', 'Corpo Clínico'],
+        labels: ['Consultas Hoje', 'Atendimentos Concluídos'],
         datasets: [{
-          label: 'Métricas da Clínica',
-          data: [
-            this.resumo.consultasHoje,
-            this.resumo.consultasConcluidas,
-            this.resumo.totalPacientes,
-            this.resumo.totalMedicos
-          ],
+          data: [this.resumo.consultasHoje, this.resumo.consultasConcluidas],
           backgroundColor: [
-            'rgba(59, 130, 246, 0.7)',  // Azul
-            'rgba(16, 185, 129, 0.7)',  // Verde
-            'rgba(245, 158, 11, 0.7)',  // Laranja
-            'rgba(139, 92, 246, 0.7)'   // Roxo
+            '#3b82f6', // Azul (Agendadas)
+            '#10b981'  // Verde (Concluídas)
           ],
-          borderColor: [
-            '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'
-          ],
-          borderWidth: 1,
-          borderRadius: 6 // Cantos arredondados nas barras
+          borderWidth: 0,
+          hoverOffset: 10 // A fatia "pula" para fora quando passa o mouse!
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '65%', // Tamanho do buraco no meio (deixa o design mais leve)
         plugins: {
-          legend: { display: false } // Esconde a legenda superior que não precisamos
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 } // Garante que o eixo Y mostre números inteiros (1, 2, 3...)
+          legend: {
+            position: 'bottom', // Coloca a legenda em baixo para não espremer o gráfico
+            labels: { color: '#64748b', font: { size: 14 } }
           }
         }
       }
