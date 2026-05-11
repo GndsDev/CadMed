@@ -6,6 +6,7 @@ import com.myproj.CadMed.Model.UserRole;
 import com.myproj.CadMed.Model.Usuario;
 import com.myproj.CadMed.Repository.PacienteRepository;
 import com.myproj.CadMed.Repository.UsuarioRepository;
+import jakarta.validation.Valid; // <-- IMPORTAÇÃO ADICIONADA
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,7 +18,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pacientes")
-
 public class PacienteController {
 
     @Autowired
@@ -28,7 +28,8 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> cadastrar(@RequestBody DadosCadastroPaciente dados) {
+    // <-- @Valid ADICIONADO AQUI
+    public ResponseEntity<?> cadastrar(@Valid @RequestBody DadosCadastroPaciente dados) {
         if (this.usuarioRepository.findByEmail(dados.email()).isPresent()) {
             return ResponseEntity.badRequest().body("E-mail já registado!");
         }
@@ -49,11 +50,8 @@ public class PacienteController {
         return ResponseEntity.ok().body("Paciente registado com sucesso!");
     }
 
-    // --- MÉTODOS NOVOS ADICIONADOS AQUI ---
-
     @GetMapping
     public ResponseEntity<List<Paciente>> listarTodos() {
-        // Agora só devolve quem tem a flag ativo = true
         return ResponseEntity.ok(pacienteRepository.findAllByAtivoTrue());
     }
 
@@ -66,10 +64,10 @@ public class PacienteController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> atualizarPaciente(@PathVariable UUID id, @RequestBody Paciente dadosAtualizados) {
+    // <-- @Valid ADICIONADO AQUI
+    public ResponseEntity<?> atualizarPaciente(@PathVariable UUID id, @Valid @RequestBody Paciente dadosAtualizados) {
         return pacienteRepository.findById(id).map(pacienteExistente -> {
 
-            // 1. Atualiza os dados do Paciente
             pacienteExistente.setNome(dadosAtualizados.getNome());
             pacienteExistente.setCpf(dadosAtualizados.getCpf());
             pacienteExistente.setTelefone(dadosAtualizados.getTelefone());
@@ -78,24 +76,17 @@ public class PacienteController {
                 pacienteExistente.getUsuario().setEmail(dadosAtualizados.getUsuario().getEmail());
             }
 
-            // 2. Salva e devolve o paciente atualizado
             pacienteRepository.save(pacienteExistente);
             return ResponseEntity.ok(pacienteExistente);
 
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> excluirPaciente(@PathVariable UUID id) {
-        // Vai buscar o paciente ao banco de dados
         var paciente = pacienteRepository.getReferenceById(id);
-
-        // Em vez de deleteById, chamamos o método que muda para false
         paciente.inativar();
-
-        // Retorna sucesso para o Angular (o Angular vai achar que foi apagado!)
         return ResponseEntity.noContent().build();
     }
 }

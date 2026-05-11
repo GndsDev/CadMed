@@ -6,6 +6,7 @@ import com.myproj.CadMed.Model.UserRole;
 import com.myproj.CadMed.Model.Usuario;
 import com.myproj.CadMed.Repository.MedicoRepository;
 import com.myproj.CadMed.Repository.UsuarioRepository;
+import jakarta.validation.Valid; // <-- IMPORTAÇÃO ADICIONADA
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,7 +18,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/medicos")
-
 public class MedicoController {
 
     @Autowired
@@ -28,7 +28,8 @@ public class MedicoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> cadastrar(@RequestBody DadosCadastroMedico dados) {
+    // <-- @Valid ADICIONADO AQUI
+    public ResponseEntity<?> cadastrar(@Valid @RequestBody DadosCadastroMedico dados) {
         if (this.usuarioRepository.findByEmail(dados.email()).isPresent()) {
             return ResponseEntity.badRequest().body("Email já cadastrado!");
         }
@@ -51,31 +52,27 @@ public class MedicoController {
 
     @GetMapping
     public ResponseEntity<List<Medico>> listarTodos() {
-        // Agora o Angular só recebe os médicos com ativo = true
         return ResponseEntity.ok(medicoRepository.findAllByAtivoTrue());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Medico> buscarPorId(@PathVariable UUID id) {
-        // Vai ao banco de dados procurar o médico por este ID específico
         return medicoRepository.findById(id)
-                .map(ResponseEntity::ok) // Se achar, devolve 200 OK com os dados
-                .orElse(ResponseEntity.notFound().build()); // Se não achar, devolve 404 Not Found
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> atualizarMedico(@PathVariable UUID id, @RequestBody Medico dadosAtualizados) {
+    // <-- @Valid ADICIONADO AQUI
+    public ResponseEntity<?> atualizarMedico(@PathVariable UUID id, @Valid @RequestBody Medico dadosAtualizados) {
         return medicoRepository.findById(id).map(medicoExistente -> {
 
-            // 1. Atualiza os dados próprios do Médico
             medicoExistente.setNome(dadosAtualizados.getNome());
             medicoExistente.setCrm(dadosAtualizados.getCrm());
             medicoExistente.setEspecialidade(dadosAtualizados.getEspecialidade());
             medicoExistente.setTelefone(dadosAtualizados.getTelefone());
 
-            // 2. O SEGREDO: Atualiza o Email indo buscar o Usuário associado
-            // Verificamos se o usuário existe para evitar erro de NullPointer
             if (medicoExistente.getUsuario() != null && dadosAtualizados.getUsuario() != null) {
                 medicoExistente.getUsuario().setEmail(dadosAtualizados.getUsuario().getEmail());
             }
@@ -89,13 +86,8 @@ public class MedicoController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> excluirMedico(@PathVariable UUID id) {
-        // 1. Pega o médico pelo ID
         var medico = medicoRepository.getReferenceById(id);
-
-        // 2. Carimba como inativo (ativo = false)
         medico.inativar();
-
-        // 3. Devolve sucesso para o Angular
         return ResponseEntity.noContent().build();
     }
 }

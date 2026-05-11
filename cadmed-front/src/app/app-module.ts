@@ -12,6 +12,7 @@ import { AppComponent } from './app';
 import { routes } from './app.routes';
 import { BreadcrumbComponent } from './components/breadcrumb';
 import { FinanceiroComponent } from './financeiro/financeiro';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 
 
 @NgModule({
@@ -22,13 +23,15 @@ import { FinanceiroComponent } from './financeiro/financeiro';
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule,     // Necessário para ngModel
-    CommonModule,    // Necessário para ngClass, ngIf
+    FormsModule,
+    CommonModule,
     RouterModule.forRoot(routes),
+    NgxMaskDirective,
+    NgxMaskPipe,
     BreadcrumbComponent,
     ToastComponent
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [provideNgxMask(), { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
