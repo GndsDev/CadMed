@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PacienteService } from '../../services/paciente.service';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-paciente-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgxMaskDirective],
   templateUrl: './paciente-form.html',
   styleUrls: ['./paciente-form.css'] // Usa o mesmo arquivo CSS que usámos no médico!
 })

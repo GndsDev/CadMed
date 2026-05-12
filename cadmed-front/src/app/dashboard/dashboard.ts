@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { DashboardService } from '../services/dashboard.service';
 
-// 1. Importações obrigatórias do Chart.js
+// 1. Importações do Chart.js
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
@@ -15,7 +15,7 @@ Chart.register(...registerables);
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
 
   resumo: any = {
     totalPacientes: 0,
@@ -25,8 +25,11 @@ export class DashboardComponent implements OnInit {
     faturamentoHoje: 0
   };
 
+  // Ideia 6: Lista de avisos (Pode vir do back-end no futuro)
+  avisos: any[] = [];
+
   carregando = true;
-  grafico: any; // 2. Variável para guardar a instância do gráfico na memória
+  graficoFluxo: any; // Instância do gráfico de barras
 
   constructor(
     public authService: AuthService,
@@ -39,7 +42,13 @@ export class DashboardComponent implements OnInit {
     this.tentarCarregarEstatisticas();
   }
 
-  // Espera ativa: Só chama o back-end quando o token realmente existir
+  ngAfterViewInit() {
+    // Se os dados já estiverem carregados por algum motivo, renderiza
+    if (!this.carregando) {
+      this.renderizarGraficoFluxo();
+    }
+  }
+
   tentarCarregarEstatisticas() {
     if (this.authService.getToken()) {
       this.carregarResumo();
@@ -53,63 +62,78 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getResumo().subscribe({
       next: (dados) => {
         this.resumo = dados;
-        this.carregando = false;
-        this.cdr.detectChanges(); // Força a tela a apagar a ampulheta imediatamente!
 
-        // 3. Após a tela atualizar com os números, desenhamos o gráfico
-        this.renderizarGrafico();
+        // 2. Alimenta a Central de Avisos com os dados vindos do Java!
+        // Usamos o || [] para garantir que não dá erro se o Java não mandar nada
+        this.avisos = dados.avisos || [];
+
+        this.carregando = false;
+        this.cdr.detectChanges();
+
+        // 3. Chama o gráfico APENAS APÓS receber os dados do Java
+        setTimeout(() => this.renderizarGraficoFluxo(), 0);
       },
       error: (e) => {
-        console.error('Erro ao carregar os dados do dashboard', e);
+        console.error('Erro ao carregar os dados', e);
         this.carregando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  // 4. A função que constrói o visual do gráfico de barras
-  renderizarGrafico() {
-    const canvas = document.getElementById('meuGrafico') as HTMLCanvasElement;
+  // Ideia 5: Renderiza o gráfico de barras (Fluxo Semanal)
+  renderizarGraficoFluxo() {
+    const canvas = document.getElementById('graficoFluxo') as HTMLCanvasElement;
     if (!canvas) return;
 
-    // Se já existir um gráfico, destrói antes de criar outro (evita bugs de sobreposição)
-    if (this.grafico) {
-      this.grafico.destroy();
+    if (this.graficoFluxo) {
+      this.graficoFluxo.destroy();
     }
 
-    this.grafico = new Chart(canvas, {
-      type: 'doughnut', // Aqui está a mágica: mudou de 'bar' para 'doughnut' (rosca)
+    // 1. Gera os rótulos dinamicamente (Ex: se hoje for Quinta, ele cria ['Sáb', 'Dom', 'Seg', 'Ter', 'Qua', 'Qui'])
+    const labelsDinamicas = [];
+    for (let i = 5; i >= 0; i--) {
+      const data = new Date();
+      data.setDate(data.getDate() - i);
+      // Pega o nome abreviado do dia em português (ex: "seg", "ter") e coloca com a primeira letra maiúscula
+      let diaFormatado = data.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+      diaFormatado = diaFormatado.charAt(0).toUpperCase() + diaFormatado.slice(1);
+      labelsDinamicas.push(diaFormatado);
+    }
+
+    // 2. Pega os dados reais vindos do Java
+    const dadosReaisDoGrafico = this.resumo.fluxoSemanal || [0, 0, 0, 0, 0, 0];
+
+    this.graficoFluxo = new Chart(canvas, {
+      type: 'bar',
       data: {
-        labels: ['Consultas Hoje', 'Atendimentos Concluídos'],
+        labels: labelsDinamicas, // <-- Nomes dos dias gerados dinamicamente
         datasets: [{
-          data: [this.resumo.consultasHoje, this.resumo.consultasConcluidas],
-          backgroundColor: [
-            '#3b82f6', // Azul (Agendadas)
-            '#10b981'  // Verde (Concluídas)
-          ],
-          borderWidth: 0,
-          hoverOffset: 10 // A fatia "pula" para fora quando passa o mouse!
+          label: 'Atendimentos',
+          data: dadosReaisDoGrafico, // <-- Dados 100% reais do banco!
+          backgroundColor: '#10b981',
+          borderRadius: 5,
+          barThickness: 25
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '65%', // Tamanho do buraco no meio (deixa o design mais leve)
-        plugins: {
-          legend: {
-            position: 'bottom', // Coloca a legenda em baixo para não espremer o gráfico
-            labels: { color: '#64748b', font: { size: 14 } }
-          }
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { stepSize: 1 } // Garante que o eixo Y mostre números inteiros (1, 2, 3...)
+          },
+          x: { grid: { display: false } }
         }
       }
     });
   }
 
-  isMedico(): boolean {
-    return this.authService.isMedico();
-  }
-
-  isSecretaria(): boolean {
-    return this.authService.isSecretaria();
-  }
+  // Auxiliares de permissão
+  isMedico() { return this.authService.isMedico(); }
+  isSecretaria() { return this.authService.isSecretaria(); }
+  isPaciente() { return this.authService.isPaciente(); }
 }

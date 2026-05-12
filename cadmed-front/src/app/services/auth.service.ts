@@ -65,6 +65,10 @@ export class AuthService {
     return this.getRole() === UserRole.SECRETARIA;
   }
 
+  isPaciente(): boolean {
+    return this.getRole() === UserRole.PACIENTE;
+  }
+
   obterUsuarioAtual(): Usuario | null {
     return this.getUsuario();
   }

@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { MedicoService } from '../../services/medico.service';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { DadosCadastroMedico } from '../../models/medico';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-medico-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgxMaskDirective],
   templateUrl: './medico-form.html',
   styleUrls: ['./medico-form.css']
 })

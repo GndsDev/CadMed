@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface PacienteRepository extends JpaRepository<Paciente, UUID> {
     List<Paciente> findAllByAtivoTrue();
     long countByAtivoTrue(); // Conta apenas os pacientes que não foram excluídos
+    long countByTelefoneIsNull();
+    long countByTelefone(String telefone);
 }

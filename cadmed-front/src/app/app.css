@@ -1,22 +1,72 @@
-/* Fundo com ligeiro detalhe */
+/* ========================================== */
+/* 1. FUNDO E ESTRUTURA GERAL                 */
+/* ========================================== */
 .app-wrapper {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background-image: radial-gradient(circle at 50% 0%, #e0f2fe 0%, transparent 50%);
   background-repeat: no-repeat;
+  background-color: var(--bg-app);
 }
 
-.container {
+.main-content {
+  margin-top: 80px; /* Espaço para não ficar debaixo da navbar fixa */
+  padding: 2rem;
+  flex: 1;
+  min-height: calc(100vh - 80px);
+}
+
+.content-wrapper {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
 }
 
-/* Header & Brand */
-.header { margin-bottom: 2.5rem; display: flex; justify-content: center; }
-.brand { display: flex; align-items: center; gap: 15px; }
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: radial-gradient(circle at 50% 0%, #e0f2fe 0%, transparent 50%);
+  background-repeat: no-repeat;
+  background-color: var(--bg-app);
+  padding: 2rem;
+}
+
+/* ========================================== */
+/* 2. HEADER E NAVEGAÇÃO (TOP NAVBAR)         */
+/* ========================================== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: white !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0 2rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  z-index: 100;
+  box-sizing: border-box !important;
+}
+
+.brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.logo-link {
+  text-decoration: none !important;
+  color: inherit !important;
+}
 
 .logo-icon {
-  font-size: 3rem;
+  font-size: 2.5rem;
   filter: drop-shadow(0 4px 6px rgba(2, 132, 199, 0.2));
   animation: float 3s ease-in-out infinite;
 }
@@ -27,21 +77,139 @@
   100% { transform: translateY(0px); }
 }
 
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-text h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  line-height: 1;
+}
+
 .gradient-text {
-  font-size: 2.5rem;
   font-weight: 800;
   background: var(--primary-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  line-height: 1.1;
 }
 
 .subtitle {
-  font-size: 1rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
 }
 
-/* Cards com Efeito Glass/Premium */
+/* O MENU CENTRALIZADO */
+.main-nav {
+  display: block !important;
+}
+
+.nav-list {
+  display: flex !important;
+  gap: 1rem !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  text-decoration: none !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  font-size: 0.95rem !important;
+}
+
+.nav-item:hover {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+}
+
+.active-link {
+  background-color: #10b981 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* ========================================== */
+/* 3. BOTÕES (INCLUINDO LOGOUT)               */
+/* ========================================== */
+.btn-logout {
+  background: rgba(255, 77, 79, 0.1) !important;
+  color: #ff4d4f !important;
+  border: 1px solid rgba(255, 77, 79, 0.3) !important;
+  padding: 8px 18px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.btn-logout:hover {
+  background: #ff4d4f !important;
+  color: #ffffff !important;
+  border-color: #ff4d4f !important;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.form-actions { display: flex; gap: 1rem; }
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; align-items: center; justify-content: center; flex: 1;
+}
+
+.btn-gradient {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.btn-gradient:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+}
+
+.btn-gradient:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: transparent; color: var(--text-muted); border: 2px solid var(--border); flex: 0.3;
+}
+
+.btn-outline:hover {
+  background: var(--input-bg); color: var(--text-dark); border-color: #cbd5e1;
+}
+
+/* ========================================== */
+/* 4. COMPONENTES VISUAIS (Cards, Inputs, etc)*/
+/* ========================================== */
 .glass-card {
   background: var(--surface);
   backdrop-filter: blur(10px);
@@ -69,7 +237,6 @@
   font-weight: 700;
 }
 
-/* Formulário Moderno */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -103,73 +270,9 @@ input:focus, select:focus {
   box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
 }
 
-/* Botões Premium */
-.form-actions { display: flex; gap: 1rem; }
-
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex; align-items: center; justify-content: center; flex: 1;
-}
-
 /* ========================================== */
-/* BOTÃO DE LOGOUT ELEGANTE                   */
+/* 5. TABELAS E LISTAS                        */
 /* ========================================== */
-.btn-logout {
-  background: rgba(255, 77, 79, 0.1);
-  color: #ff4d4f;
-  border: 1px solid rgba(255, 77, 79, 0.3);
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Espaço entre o ícone e o texto */
-}
-
-.btn-logout:hover {
-  background: #ff4d4f;
-  color: #ffffff;
-  border-color: #ff4d4f;
-  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
-  transform: translateY(-1px);
-}
-
-.btn-gradient {
-  background: var(--primary-gradient);
-  color: white;
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-}
-
-.btn-gradient:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
-}
-
-.btn-gradient:disabled {
-  background: #e2e8f0;
-  color: #94a3b8;
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.btn-outline {
-  background: transparent; color: var(--text-muted); border: 2px solid var(--border); flex: 0.3;
-}
-
-.btn-outline:hover {
-  background: var(--input-bg); color: var(--text-dark); border-color: #cbd5e1;
-}
-
-/* Tabela de Alta Qualidade */
 .table-container {
   overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border);
 }
@@ -189,7 +292,6 @@ input:focus, select:focus {
 
 .table-row:hover { background-color: var(--surface-hover); }
 
-/* Detalhes Visuais na Tabela */
 .patient-info { display: flex; align-items: center; gap: 12px; }
 .avatar {
   width: 40px; height: 40px; background: var(--primary-light); color: var(--primary);
@@ -209,7 +311,6 @@ input:focus, select:focus {
   border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border);
 }
 
-/* Botões de Ação Modernos */
 .action-buttons { display: flex; gap: 10px; justify-content: center; }
 .action-btn {
   background: var(--input-bg); border: 1px solid transparent; color: var(--text-muted);
@@ -220,92 +321,26 @@ input:focus, select:focus {
 .action-btn.edit:hover { background: #fef9c3; color: #ca8a04; border-color: #fde047; }
 .action-btn.delete:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-/* Empty State Moderno */
 .empty-state { text-align: center; padding: 4rem 2rem; }
 .empty-illustration { font-size: 4rem; margin-bottom: 1rem; opacity: 0.8; }
 .empty-state h3 { color: var(--text-dark); font-size: 1.2rem; margin-bottom: 0.5rem; }
 .empty-state p { color: var(--text-muted); font-size: 0.95rem; }
 
 /* ========================================== */
-/* LAYOUT COM SIDEBAR                         */
+/* 6. RESPONSIVIDADE (MOBILE)                 */
 /* ========================================== */
-
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-image: radial-gradient(circle at 50% 0%, #e0f2fe 0%, transparent 50%);
-  background-repeat: no-repeat;
-}
-
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: var(--surface);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  padding: 0 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 100;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brand-text h1 {
-  font-size: 1.8rem;
-  margin: 0;
-  line-height: 1;
-}
-
-.logo-icon {
-  font-size: 2.5rem;
-  filter: drop-shadow(0 4px 6px rgba(2, 132, 199, 0.2));
-  animation: float 3s ease-in-out infinite;
-}
-
-.main-content {
-  margin-top: 80px;
-  padding: 2rem;
-  flex: 1;
-  background: white;
-  min-height: calc(100vh - 80px);
-}
-
-.content-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-image: radial-gradient(circle at 50% 0%, #e0f2fe 0%, transparent 50%);
-  background-repeat: no-repeat;
-  background-color: var(--bg-app);
-  padding: 2rem;
-}
-
-/* Responsivo */
+/* IMPORTANTE: As chaves do @media fecham apenas no final! */
 @media (max-width: 768px) {
   .header {
-    padding: 0 1.5rem;
+    padding: 0 1rem !important;
+  }
+
+  .nav-list {
+    gap: 0.5rem !important;
+  }
+
+  .nav-item span {
+    display: none; /* Esconde o texto no celular, deixa só os ícones */
   }
 
   .brand-text h1 {
@@ -322,7 +357,7 @@ input:focus, select:focus {
   }
 
   .brand {
-    gap: 10px;
+    gap: 10px !important;
   }
 
   .logo-icon {

@@ -1,98 +1,149 @@
-<div style="max-width: 1000px; margin: 0 auto; padding-bottom: 3rem;">
+<div class="dashboard-container">
 
-  <div class="card-header" style="text-align: center; margin-bottom: 3rem;">
-    <h2 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 0.5rem;">Painel de Controle</h2>
-    <p class="header-desc" *ngIf="isSecretaria()">Visão geral e estatísticas da clínica em tempo real.</p>
-    <p class="header-desc" *ngIf="isMedico()">Resumo diário e acesso rápido aos seus pacientes.</p>
-  </div>
-
-  <div *ngIf="carregando" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-    <h3 style="font-size: 1.5rem;">⏳ A calcular métricas...</h3>
+  <div *ngIf="carregando" class="loading-state">
+    <h3>⏳ Preparando o seu painel...</h3>
   </div>
 
   <div *ngIf="!carregando">
 
-    <div class="glass-card" *ngIf="isSecretaria()" style="text-align: center; border-left: 6px solid #14b8a6; margin-bottom: 2rem; padding: 2rem;">
-      <h4 style="margin: 0; color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Faturamento do Dia</h4>
-      <div style="font-size: 3.5rem; color: #14b8a6; font-weight: 800; margin-top: 0.5rem;">
-        {{ resumo.faturamentoHoje | currency:'BRL':'symbol':'1.2-2' }}
+    <div *ngIf="isSecretaria()" class="dashboard-view">
+
+      <header class="view-header">
+        <h2 class="gradient-text title-lg">Painel de Gestão</h2>
+        <p class="header-desc">Visão geral e estatísticas da clínica em tempo real.</p>
+      </header>
+
+      <div class="glass-card kpi-highlight faturamento-card">
+        <h4>Faturamento do Dia</h4>
+        <div class="kpi-value">{{ resumo.faturamentoHoje | currency:'BRL':'symbol':'1.2-2' }}</div>
       </div>
+
+      <div class="kpi-grid">
+        <div class="glass-card kpi-card border-blue">
+          <div class="kpi-number">{{ resumo.consultasHoje }}</div>
+          <p class="header-desc">Consultas Hoje</p>
+        </div>
+        <div class="glass-card kpi-card border-green">
+          <div class="kpi-number">{{ resumo.consultasConcluidas }}</div>
+          <p class="header-desc">Concluídas</p>
+        </div>
+        <div class="glass-card kpi-card border-orange">
+          <div class="kpi-number">{{ resumo.totalPacientes }}</div>
+          <p class="header-desc">Total Pacientes</p>
+        </div>
+        <div class="glass-card kpi-card border-purple">
+          <div class="kpi-number">{{ resumo.totalMedicos }}</div>
+          <p class="header-desc">Corpo Clínico</p>
+        </div>
+      </div>
+
+      <section class="intelligence-grid">
+        <div class="glass-card chart-section">
+          <h2 class="section-title">Fluxo Semanal</h2>
+          <div class="canvas-wrapper"><canvas id="graficoFluxo"></canvas></div>
+        </div>
+
+        <div class="glass-card alerts-section">
+          <h2 class="section-title border-bottom">Alertas do Sistema</h2>
+          <div class="alerts-list">
+            <div *ngFor="let aviso of avisos" class="alert-item" [ngClass]="aviso.tipo">
+              <div class="alert-icon">
+                <span *ngIf="aviso.tipo === 'critical'">🚨</span>
+                <span *ngIf="aviso.tipo === 'warning'">⚠️</span>
+                <span *ngIf="aviso.tipo === 'info'">ℹ️</span>
+              </div>
+              <div class="alert-content">
+                <strong>{{ aviso.titulo }}</strong>
+                <span>{{ aviso.desc }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
 
-    <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
-      <div class="glass-card" style="text-align: center; border-bottom: 3px solid #3b82f6;">
-        <div style="font-size: 2.5rem; color: #3b82f6; font-weight: bold; line-height: 1;">{{ resumo.consultasHoje }}</div>
-        <p class="header-desc" style="font-size: 0.9rem; margin-top: 0.5rem;">Consultas Hoje</p>
-      </div>
+    <div *ngIf="isMedico()" class="dashboard-view">
 
-      <div class="glass-card" style="text-align: center; border-bottom: 3px solid #10b981;">
-        <div style="font-size: 2.5rem; color: #10b981; font-weight: bold; line-height: 1;">{{ resumo.consultasConcluidas }}</div>
-        <p class="header-desc" style="font-size: 0.9rem; margin-top: 0.5rem;">Atendimentos</p>
-      </div>
+      <header class="view-header text-left">
+        <h2 class="gradient-text title-md">Olá, Doutor(a)</h2>
+        <p class="header-desc">Aqui está o resumo da sua agenda para hoje.</p>
+      </header>
 
-      <div class="glass-card" style="text-align: center; border-bottom: 3px solid #f59e0b;">
-        <div style="font-size: 2.5rem; color: #f59e0b; font-weight: bold; line-height: 1;">{{ resumo.totalPacientes }}</div>
-        <p class="header-desc" style="font-size: 0.9rem; margin-top: 0.5rem;">Pacientes Ativos</p>
-      </div>
-
-      <div class="glass-card" *ngIf="isSecretaria()" style="text-align: center; border-bottom: 3px solid #8b5cf6;">
-        <div style="font-size: 2.5rem; color: #8b5cf6; font-weight: bold; line-height: 1;">{{ resumo.totalMedicos }}</div>
-        <p class="header-desc" style="font-size: 0.9rem; margin-top: 0.5rem;">Corpo Clínico</p>
-      </div>
-    </div>
-
-    <div class="glass-card" *ngIf="isSecretaria()" style="cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1.5rem; transition: transform 0.2s;" routerLink="/medicos" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-          <div style="font-size: 2.5rem;">👨‍⚕️</div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem;">Corpo Clínico</h3>
-            <p class="header-desc" style="margin: 0; font-size: 0.9rem;">Administrar profissionais</p>
+      <div class="kpi-grid-duo">
+        <div class="glass-card kpi-row border-blue">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-text-group">
+            <div class="kpi-number-sm">{{ resumo.consultasHoje }}</div>
+            <p class="header-desc">Suas consultas hoje</p>
           </div>
         </div>
 
-        <div class="glass-card" *ngIf="isSecretaria()" style="cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1.5rem; transition: transform 0.2s;" routerLink="/financeiro" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-          <div style="font-size: 2.5rem;">💰</div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem;">Relatório Financeiro</h3>
-            <p class="header-desc" style="margin: 0; font-size: 0.9rem;">Faturamento e histórico</p>
+        <div class="glass-card kpi-row border-green">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-text-group">
+            <div class="kpi-number-sm">{{ resumo.consultasConcluidas }}</div>
+            <p class="header-desc">Pacientes já atendidos</p>
           </div>
-        </div>
-
-    <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
-
-      <div class="glass-card" *ngIf="isSecretaria() || isMedico()" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <h3 style="margin-bottom: 1rem; color: var(--text-color); font-size: 1.2rem;">Proporção de Atendimentos</h3>
-        <div style="position: relative; height: 250px; width: 100%;">
-          <canvas id="meuGrafico"></canvas>
         </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <div class="glass-card" style="cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1.5rem; transition: transform 0.2s;" routerLink="/agenda" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-          <div style="font-size: 2.5rem;">📅</div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem;">Agenda de Consultas</h3>
-            <p class="header-desc" style="margin: 0; font-size: 0.9rem;">Gerir horários e marcações</p>
-          </div>
+      <div class="glass-card agenda-card">
+        <h2 class="section-title border-bottom">Próximos Pacientes</h2>
+
+        <div class="empty-state" *ngIf="resumo.consultasHoje === 0">
+          <h3>Sua agenda está livre para hoje!</h3>
+          <p>Aproveite para organizar os prontuários.</p>
         </div>
 
-        <div class="glass-card" *ngIf="isSecretaria() || isMedico()" style="cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1.5rem; transition: transform 0.2s;" routerLink="/pacientes" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-          <div style="font-size: 2.5rem;">👥</div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem;">Gestão de Pacientes</h3>
-            <p class="header-desc" *ngIf="isSecretaria()" style="margin: 0; font-size: 0.9rem;">Prontuários e registos globais</p>
-            <p class="header-desc" *ngIf="isMedico()" style="margin: 0; font-size: 0.9rem;">Consulte os seus pacientes</p>
-          </div>
-        </div>
+        <div *ngIf="resumo.consultasHoje > 0" class="agenda-preview">
+           <div class="agenda-item-mock">
+             <div class="mock-time">Aguardando</div>
+             <div class="mock-details">
+               <strong>Verifique a aba de Agenda</strong>
+               <span>Lista completa de pacientes do dia</span>
+             </div>
+           </div>
 
-        <div class="glass-card" *ngIf="isSecretaria()" style="cursor: pointer; display: flex; align-items: center; gap: 1rem; padding: 1.5rem; transition: transform 0.2s;" routerLink="/medicos" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
-          <div style="font-size: 2.5rem;">👨‍⚕️</div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem;">Corpo Clínico</h3>
-            <p class="header-desc" style="margin: 0; font-size: 0.9rem;">Administrar profissionais</p>
-          </div>
+           <button class="btn btn-outline full-width mt-3" routerLink="/agenda">
+             Abrir Agenda Completa
+           </button>
         </div>
       </div>
 
     </div>
+
+    <div *ngIf="isPaciente()" class="dashboard-view">
+
+      <section class="cadmed-brand-banner glass-card" style="margin-bottom: 2rem;">
+        <div class="brand-content">
+          <div class="brand-logo-large" style="font-size: 3rem; margin-bottom: 1rem;">⚕️</div>
+          <h1 class="gradient-text title-xl">Bem-vindo ao CadMed</h1>
+          <p class="brand-description" style="color: var(--text-muted); max-width: 600px; margin: 0 auto 1.5rem;">
+            O seu portal de saúde inteligente. Cuidado, transparência e tecnologia ao serviço do seu bem-estar.
+          </p>
+          <div class="brand-values" style="display: flex; justify-content: center; gap: 1.5rem; font-weight: 500;">
+            <div class="value-item">🛡️ Dados Seguros</div>
+            <div class="value-item">🩺 Corpo Clínico Especializado</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-grid" style="grid-template-columns: 1fr; max-width: 500px; margin: 0 auto;">
+        <div class="glass-card kpi-row border-blue"
+            routerLink="/agenda"
+            style="cursor: pointer; justify-content: center; transition: transform 0.2s;"
+            onmouseover="this.style.transform='translateY(-5px)'"
+            onmouseout="this.style.transform='translateY(0)'">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-text-group" style="text-align: left;">
+            <div class="kpi-number-sm" style="font-size: 1.5rem;">Acessar Minha Agenda</div>
+            <p class="header-desc" style="margin: 0;">Visualize os horários das suas consultas</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </div>

@@ -48,6 +48,25 @@ export const routes: Routes = [
   { path: 'pacientes', component: PacienteListComponent },
   { path: 'agenda', component: AgendaComponent },
   // Se abrir o site vazio, vai para a página de Login!
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+
+  {
+    path: 'financeiro',
+    component: FinanceiroComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_SECRETARIA'] }
+  },
+  {
+    path: 'medicos',
+    component: MedicoListComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_SECRETARIA'] }
+  },
+  {
+    path: 'agenda',
+    component: AgendaComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_SECRETARIA', 'ROLE_MEDICO'] }
+  }
 
 ];

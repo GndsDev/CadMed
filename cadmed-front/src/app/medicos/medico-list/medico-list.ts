@@ -5,6 +5,7 @@ import { MedicoService } from '../../services/medico.service';
 import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { AuthService } from '../../services/auth.service';
 
+
 @Component({
   selector: 'app-medico-list',
   standalone: true,

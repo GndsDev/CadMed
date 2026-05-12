@@ -29,8 +29,17 @@ public class Medico {
     private String nome;
 
     @NotBlank(message = "O CRM é obrigatório")
-    @Column(unique = true) // Impede que dois médicos sejam registados com o mesmo CRM
+    @Pattern(regexp = "\\d{4,10}-[a-zA-Z]{2}", message = "Formato de CRM inválido. Use o padrão NÚMEROS-UF (ex: 12345-SP)")
+    @Column(unique = true)
     private String crm;
+
+    public void setCrm(String crm) {
+        if (crm != null) {
+            this.crm = crm.toUpperCase();
+        } else {
+            this.crm = null;
+        }
+    }
 
     @NotBlank(message = "A especialidade é obrigatória")
     private String especialidade;

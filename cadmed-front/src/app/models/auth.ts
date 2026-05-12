@@ -1,6 +1,7 @@
 export enum UserRole {
   MEDICO = 'MEDICO',
-  SECRETARIA = 'SECRETARIA'
+  SECRETARIA = 'SECRETARIA',
+  PACIENTE = 'PACIENTE'
 }
 
 export interface DadosAutenticacao {

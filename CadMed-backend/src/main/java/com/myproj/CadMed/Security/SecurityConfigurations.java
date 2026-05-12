@@ -59,7 +59,7 @@ public class SecurityConfigurations {
                         // Rotas de Agendamentos
                         .requestMatchers(HttpMethod.POST, "/api/agendamentos").hasRole("SECRETARIA") // Agendamento via Secretaria
                         .requestMatchers(HttpMethod.GET, "/api/agendamentos").authenticated() // Visualização da agenda total
-                        .requestMatchers(HttpMethod.DELETE, "/api/agendamentos/**").authenticated() // Cancelamento via Secretaria
+                        .requestMatchers(HttpMethod.DELETE, "/api/agendamentos/**").hasRole("SECRETARIA") // Cancelamento via Secretaria
                         .requestMatchers(HttpMethod.PATCH, "/api/agendamentos/*/status").authenticated()
 
                         // Rotas de Prontuários (O coração da consulta)
