@@ -1,13 +1,9 @@
-<div *ngIf="!authService.isAutenticado()" class="login-container">
-  <router-outlet></router-outlet>
-</div>
+<div [ngClass]="{'app-wrapper': authService.isAutenticado()}">
 
-<div *ngIf="authService.isAutenticado()" class="app-wrapper">
-
-  <header class="header">
+  <header class="header" *ngIf="authService.isAutenticado()">
 
     <div class="brand">
-        <div class="logo-icon" >⚕️</div>
+      <div class="logo-icon">⚕️</div>
       <div class="brand-text">
         <h1 class="gradient-text">CadMed</h1>
         <span class="subtitle">Portal Clínico Inteligente</span>
@@ -16,37 +12,31 @@
 
     <nav class="main-nav">
       <ul class="nav-list">
-
         <li>
           <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
             <span>Início</span>
           </a>
         </li>
-
-        <li *ngIf="authService.isSecretaria() || authService.isMedico() ||authService.isPaciente()">
+        <li *ngIf="authService.isSecretaria() || authService.isMedico() || authService.isPaciente()">
           <a routerLink="/agenda" routerLinkActive="active-link" class="nav-item">
             <span>Agenda</span>
           </a>
         </li>
-
         <li *ngIf="authService.isSecretaria()">
           <a routerLink="/pacientes" routerLinkActive="active-link" class="nav-item">
             <span>Pacientes</span>
           </a>
         </li>
-
         <li *ngIf="authService.isSecretaria()">
           <a routerLink="/medicos" routerLinkActive="active-link" class="nav-item">
             <span>Corpo Clínico</span>
           </a>
         </li>
-
         <li *ngIf="authService.isSecretaria()">
           <a routerLink="/financeiro" routerLinkActive="active-link" class="nav-item">
             <span>Financeiro</span>
           </a>
         </li>
-
       </ul>
     </nav>
 
@@ -61,10 +51,12 @@
 
   </header>
 
-  <main class="main-content">
-    <div class="content-wrapper">
+  <main [ngClass]="authService.isAutenticado() ? 'main-content' : 'login-container'">
+
+    <div [ngClass]="{'content-wrapper': authService.isAutenticado()}">
       <router-outlet></router-outlet>
     </div>
+
   </main>
 
   <app-toast></app-toast>

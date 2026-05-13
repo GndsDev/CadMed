@@ -1,0 +1,51 @@
+/* ==========================================================================
+   📱 MODO MOBILE (Ecrãs até 768px)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+
+  /* 1. Ajustar os cartões para não gastarem espaço à toa */
+  .glass-card, .form-section {
+    margin: 10px !important;
+    padding: 15px !important;
+  }
+
+  .card-header h2 {
+    font-size: 1.3rem;
+  }
+
+  /* 2. Formulário: Uma coluna apenas (Tudo em baixo um do outro) */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+
+  /* 3. A Tabela: Salvação do layout (Swipe horizontal) */
+  .table-container {
+    width: 100%;
+    overflow-x: auto; /* Cria o scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* Faz o deslizar no iPhone ser suave */
+    border-radius: 8px;
+    padding-bottom: 10px;
+  }
+
+  .modern-table {
+    min-width: 600px; /* Força a tabela a ter espaço para respirar */
+  }
+
+  /* 4. Ajustar botões e badges */
+  .action-switch {
+    gap: 8px;
+  }
+
+  .btn {
+    width: 100%; /* Botões ocupam a largura toda para ser fácil tocar com o dedo */
+    margin-bottom: 10px;
+  }
+
+  .flex-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+}

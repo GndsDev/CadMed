@@ -38,7 +38,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-gradient" (click)="agendar()" [disabled]="carregando || !formAgenda.pacienteId || !formAgenda.medicoId || !formAgenda.data || !formAgenda.hora">
+      <button type="button" class="btn btn-gradient" (click)="agendar()"
+              [disabled]="carregando || !formAgenda.pacienteId || !formAgenda.medicoId || !formAgenda.data || !formAgenda.hora">
         {{ carregando ? '⏳ A processar...' : 'Confirmar Agendamento' }}
       </button>
     </div>
@@ -46,9 +47,18 @@
 </section>
 
 <section class="glass-card" style="max-width: 1000px; margin: 0 auto;">
-  <div class="card-header flex-header">
-    <h2>📋 Lista de Consultas</h2>
-    <div class="total-badge">{{ agendamentos.length }} Consultas</div>
+  <div class="card-header flex-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="margin: 0;">📋 Lista de Consultas</h2>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <label style="font-size: 0.9rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px;">
+        <input type="checkbox" [(ngModel)]="exibirHistorico" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);">
+        Mostrar histórico
+      </label>
+      <div class="total-badge">{{ agendamentosFiltrados.length }} exibidas</div>
+    </div>
   </div>
 
   <div *ngIf="carregando" style="text-align: center; padding: 20px; color: var(--text-muted);">
@@ -61,13 +71,13 @@
         <tr>
           <th>Data e Hora</th>
           <th>Paciente</th>
-          <th *ngIf="authService.isSecretaria()">Médico</th>
+          <th *ngIf="authService.isSecretaria() || authService.isPaciente()">Médico</th>
           <th>Status</th>
-          <th>Ações</th>
+          <th *ngIf="authService.isSecretaria() || authService.isMedico()">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of agendamentos" class="table-row">
+        <tr *ngFor="let item of agendamentosFiltrados" class="table-row">
 
           <td style="font-weight: 600; color: var(--primary);">{{ formatarDataHora(item.dataHora) }}</td>
 
@@ -75,7 +85,7 @@
             <div class="fw-bold">{{ item.paciente?.nome || 'Paciente removido' }}</div>
           </td>
 
-          <td *ngIf="authService.isSecretaria()">
+          <td *ngIf="authService.isSecretaria() || authService.isPaciente()">
             <div class="desc-cell">Dr(a). {{ item.medico?.nome || '-' }}</div>
           </td>
 
@@ -87,7 +97,8 @@
             </span>
           </td>
 
-          <td>
+          <td *ngIf="authService.isSecretaria() || authService.isMedico()">
+
             <div class="action-switch" *ngIf="item.status === 'AGENDADO'">
               <button *ngIf="authService.isMedico()" class="switch-btn success" title="Atender Paciente" (click)="iniciarAtendimento(item)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -95,8 +106,10 @@
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
               </button>
-              <div class="switch-divider" *ngIf="authService.isMedico()"></div>
-              <button class="switch-btn danger" title="Cancelar Consulta" (click)="cancelar(item.id)">
+
+              <div class="switch-divider" *ngIf="authService.isMedico() && authService.isSecretaria()"></div>
+
+              <button *ngIf="authService.isSecretaria()" class="switch-btn danger" title="Cancelar Consulta" (click)="cancelar(item.id)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -112,14 +125,15 @@
                 </svg>
               </button>
             </div>
+
           </td>
         </tr>
 
-        <tr *ngIf="agendamentos.length === 0">
-          <td colspan="5">
+        <tr *ngIf="agendamentosFiltrados.length === 0">
+          <td [attr.colspan]="authService.isSecretaria() ? 5 : (authService.isMedico() ? 4 : 4)">
             <div class="empty-state">
               <div class="empty-illustration">📅</div>
-              <h3>Nenhuma consulta agendada</h3>
+              <h3>Nenhuma consulta encontrada</h3>
             </div>
           </td>
         </tr>

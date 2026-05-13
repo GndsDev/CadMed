@@ -68,23 +68,24 @@ export class AgendaComponent implements OnInit {
   carregarAgendamentos() {
     this.agendamentoService.listar().subscribe({
       next: (dados: any[]) => {
-        const perfil = this.authService.getRole();
-        const usuarioAtual = this.authService.obterUsuarioAtual();
 
-        if (perfil === 'SECRETARIA') {
-          this.agendamentos = dados; // Vê tudo
-        }
-        else if (perfil === 'MEDICO' && usuarioAtual) {
-          // Filtro silencioso e limpo
-          this.agendamentos = dados.filter(a =>
-            a.medico && a.medico.email && a.medico.email.toLowerCase() === usuarioAtual.email.toLowerCase()
-          );
-        }
+        // 1. Recebe os dados e ORDENA da data mais antiga/próxima para a mais no futuro
+        this.agendamentos = dados.sort((a, b) => {
+          const dataA = new Date(a.dataHora).getTime();
+          const dataB = new Date(b.dataHora).getTime();
+          return dataA - dataB;
+          // Se quiser inverter (mais futuras no topo), basta trocar para: return dataB - dataA;
+        });
 
         this.carregando = false;
         this.cdr.detectChanges();
       },
-      error: (e: any) => { console.error(e); this.carregando = false; }
+      error: (e: any) => {
+        console.error('Erro ao carregar os agendamentos', e);
+        this.toastService.show('Erro ao carregar a agenda.', 'error');
+        this.carregando = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -221,4 +222,15 @@ iniciarAtendimento(agendamento: any) {
       }
     });
   }
+
+  exibirHistorico: boolean = false; // Por padrão, esconde finalizados e cancelados
+
+get agendamentosFiltrados() {
+  if (this.exibirHistorico) {
+    return this.agendamentos;
+  }
+  // Filtra para mostrar apenas o que ainda requer ação ou está acontecendo (AGENDADO, CONCLUIDO para cobrança)
+  // Oculta PAGO e CANCELADO
+  return this.agendamentos.filter(a => a.status === 'AGENDADO' || a.status === 'CONCLUIDO');
+}
 }

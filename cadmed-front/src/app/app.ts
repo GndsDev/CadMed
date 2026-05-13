@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 
+  menuAberto: boolean = false;
+
   constructor(
     public authService: AuthService,
     private router: Router

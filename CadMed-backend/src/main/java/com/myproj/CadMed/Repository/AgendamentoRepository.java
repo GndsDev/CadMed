@@ -18,12 +18,13 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoPaciente
 
     boolean existsByPacienteIdAndDataHora(UUID uuid, LocalDateTime localDateTime);
 
-    List<AgendamentoPaciente> findByMedicoId(UUID medicoId);
-    List<AgendamentoPaciente> findByPacienteId(@Param("pacienteId") UUID id);
+    List<AgendamentoPaciente> findByMedicoIdOrderByDataHoraAsc(UUID medicoId);
+    List<AgendamentoPaciente> findByPacienteIdOrderByDataHoraAsc(@Param("pacienteId") UUID id);
+    List<AgendamentoPaciente> findAllByOrderByDataHoraAsc();
 
     long countByStatus(StatusAgendamento status);
 
-    @Query("SELECT COUNT(a) FROM Agendamento a WHERE DATE(a.dataHora) >= CURRENT_DATE")
+    @Query("SELECT COUNT(a) FROM Agendamento a WHERE cast(a.dataHora as date) = current_date")
     long countConsultasHoje();
 
     long countByDataHora(LocalDate dataHora);

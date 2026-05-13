@@ -8,6 +8,7 @@ import com.myproj.CadMed.Model.Usuario;
 import com.myproj.CadMed.Repository.AgendamentoRepository;
 import com.myproj.CadMed.Repository.MedicoRepository;
 import com.myproj.CadMed.Repository.PacienteRepository;
+import com.myproj.CadMed.Services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ import java.util.UUID;
 public class AgendamentoController {
 
     @Autowired
-    private com.myproj.CadMed.Service.EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
     private AgendamentoRepository agendamentoRepository;
@@ -45,7 +46,7 @@ public class AgendamentoController {
             var medico = medicoRepository.findByUsuarioId(usuarioLogado.getId())
                     .orElseThrow(() -> new RuntimeException("Perfil de médico não encontrado!"));
 
-            var consultasDoMedico = agendamentoRepository.findByMedicoId(medico.getId());
+            var consultasDoMedico = agendamentoRepository.findByMedicoIdOrderByDataHoraAsc(medico.getId());
             return ResponseEntity.ok(consultasDoMedico);
         }
 
@@ -54,12 +55,12 @@ public class AgendamentoController {
             var paciente = pacienteRepository.findByUsuarioId(usuarioLogado.getId())
                     .orElseThrow(() -> new RuntimeException("Perfil de paciente não encontrado!"));
 
-            var consultasDoPaciente = agendamentoRepository.findByPacienteId(paciente.getId());
+            var consultasDoPaciente = agendamentoRepository.findByPacienteIdOrderByDataHoraAsc(paciente.getId());
             return ResponseEntity.ok(consultasDoPaciente);
         }
 
         // LÓGICA DA SECRETÁRIA: Tem passe livre para ver a agenda global
-        var todasAsConsultas = agendamentoRepository.findAll();
+        var todasAsConsultas = agendamentoRepository.findAllByOrderByDataHoraAsc();
         return ResponseEntity.ok(todasAsConsultas);
     }
 

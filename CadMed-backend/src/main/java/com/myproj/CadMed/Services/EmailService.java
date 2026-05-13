@@ -1,4 +1,4 @@
-package com.myproj.CadMed.Service;
+package com.myproj.CadMed.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
