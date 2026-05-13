@@ -35,27 +35,30 @@ public class AgendamentoController {
     @Autowired
     private PacienteRepository pacienteRepository;
 
-    // 1. LISTAR TODAS AS CONSULTAS (O Angular vai filtrar quem vê o quê)
     @GetMapping
-
     public ResponseEntity<List<AgendamentoPaciente>> listar(Authentication authentication) {
-        // 1. Descobre quem é a pessoa que está logada neste momentomy
         Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-
-        // 2. Se for um MÉDICO, o cofre só abre a gaveta dele!
         assert usuarioLogado != null;
-        if (usuarioLogado.getRole() == UserRole.MEDICO) {
 
-            // Encontra qual é o perfil de médico ligado a este login
+        // LÓGICA DO MÉDICO: Vê apenas os pacientes dele
+        if (usuarioLogado.getRole() == UserRole.MEDICO) {
             var medico = medicoRepository.findByUsuarioId(usuarioLogado.getId())
                     .orElseThrow(() -> new RuntimeException("Perfil de médico não encontrado!"));
 
-            // Devolve APENAS as consultas onde este médico está associado
             var consultasDoMedico = agendamentoRepository.findByMedicoId(medico.getId());
             return ResponseEntity.ok(consultasDoMedico);
         }
 
-        // 3. Se for a SECRETÁRIA, ela tem passe livre para ver tudo
+        // LÓGICA DO PACIENTE: Vê apenas as próprias consultas (O bloco que faltava!)
+        if (usuarioLogado.getRole() == UserRole.PACIENTE) {
+            var paciente = pacienteRepository.findByUsuarioId(usuarioLogado.getId())
+                    .orElseThrow(() -> new RuntimeException("Perfil de paciente não encontrado!"));
+
+            var consultasDoPaciente = agendamentoRepository.findByPacienteId(paciente.getId());
+            return ResponseEntity.ok(consultasDoPaciente);
+        }
+
+        // LÓGICA DA SECRETÁRIA: Tem passe livre para ver a agenda global
         var todasAsConsultas = agendamentoRepository.findAll();
         return ResponseEntity.ok(todasAsConsultas);
     }

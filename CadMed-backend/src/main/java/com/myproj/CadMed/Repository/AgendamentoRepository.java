@@ -4,6 +4,7 @@ import com.myproj.CadMed.Model.AgendamentoPaciente;
 import com.myproj.CadMed.Model.StatusAgendamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoPaciente
     boolean existsByPacienteIdAndDataHora(UUID uuid, LocalDateTime localDateTime);
 
     List<AgendamentoPaciente> findByMedicoId(UUID medicoId);
+    List<AgendamentoPaciente> findByPacienteId(@Param("pacienteId") UUID id);
 
     long countByStatus(StatusAgendamento status);
 

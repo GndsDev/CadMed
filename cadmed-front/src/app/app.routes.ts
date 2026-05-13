@@ -66,7 +66,7 @@ export const routes: Routes = [
     path: 'agenda',
     component: AgendaComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_SECRETARIA', 'ROLE_MEDICO'] }
+    data: { roles: ['ROLE_SECRETARIA', 'ROLE_MEDICO', 'ROLE_PACIENTE'] }
   }
 
 ];
