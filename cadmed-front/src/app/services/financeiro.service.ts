@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from "./auth.service"; // Ajuste o caminho se necessário
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -10,23 +9,13 @@ import { environment } from '../../environments/environment';
 export class FinanceiroService {
   private apiUrl = environment.apiUrl + '/api/financeiro';
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient) {}
 
-  // Função auxiliar para injetar o Token
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
-  // Busca os dados do gráfico
   obterDadosGrafico(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/grafico`, { headers: this.getHeaders() });
+    return this.http.get<any[]>(`${this.apiUrl}/grafico`);
   }
 
-  // Busca a tabela de histórico
   obterHistorico(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/historico`, { headers: this.getHeaders() });
+    return this.http.get<any[]>(`${this.apiUrl}/historico`);
   }
 }

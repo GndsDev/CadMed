@@ -5,12 +5,10 @@ import com.myproj.CadMed.Model.StatusPagamento;
 import com.myproj.CadMed.Repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +16,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/financeiro")
-@CrossOrigin("*")
 public class FinanceiroController {
 
     @Autowired
     private PagamentoRepository pagamentoRepository;
 
-    // Endpoint 1: Dados para o Gráfico de Barras/Linhas
     @GetMapping("/grafico")
     public ResponseEntity<List<Map<String, Object>>> obterDadosDoGrafico() {
         List<Object[]> resultados = pagamentoRepository.calcularFaturamentoMensalDoAno(StatusPagamento.PAGO);
@@ -40,7 +36,6 @@ public class FinanceiroController {
         return ResponseEntity.ok(dadosFormatados);
     }
 
-    // Endpoint 2: Dados para a Tabela de Histórico
     @GetMapping("/historico")
     public ResponseEntity<List<Pagamento>> obterHistorico() {
         List<Pagamento> ultimosPagamentos = pagamentoRepository.findTop50ByStatusOrderByDataPagamentoDesc(StatusPagamento.PAGO);

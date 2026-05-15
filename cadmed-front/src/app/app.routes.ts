@@ -1,72 +1,64 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login'; // <-- IMPORTAR O LOGIN
-import { MedicoFormComponent } from './medicos/medico-form/medico-form';
-import { PacienteFormComponent } from './pacientes/paciente-form/paciente-form';
-import { PacienteListComponent } from './pacientes/paciente-list/paciente-list';
-import { AgendaComponent } from './agendamentos/agenda/agenda';
-import { MedicoListComponent } from './medicos/medico-list/medico-list';
-import { DashboardComponent } from './dashboard/dashboard';
 import { RoleGuard } from './guards/role.guard';
 import { UserRole } from './models/auth';
-import { FinanceiroComponent } from './financeiro/financeiro';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'financeiro', component: FinanceiroComponent },
-
+  { path: 'login', loadComponent: () => import('./login/login').then((m) => m.LoginComponent) },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard').then((m) => m.DashboardComponent)
+  },
+  {
+    path: 'financeiro',
+    loadComponent: () => import('./financeiro/financeiro').then((m) => m.FinanceiroComponent),
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.SECRETARIA] }
+  },
   {
     path: 'medicos/novo',
-    component: MedicoFormComponent,
+    loadComponent: () => import('./medicos/medico-form/medico-form').then((m) => m.MedicoFormComponent),
     canActivate: [RoleGuard],
-    data: { role: UserRole.SECRETARIA }
+    data: { roles: [UserRole.SECRETARIA] }
   },
   {
     path: 'medicos',
-    component: MedicoListComponent,
+    loadComponent: () => import('./medicos/medico-list/medico-list').then((m) => m.MedicoListComponent),
     canActivate: [RoleGuard],
-    data: { role: UserRole.SECRETARIA }
+    data: { roles: [UserRole.SECRETARIA] }
   },
   {
     path: 'pacientes/novo',
-    component: PacienteFormComponent,
+    loadComponent: () =>
+      import('./pacientes/paciente-form/paciente-form').then((m) => m.PacienteFormComponent),
     canActivate: [RoleGuard],
-    data: { role: UserRole.SECRETARIA }
-  },
-
-  { path: 'pacientes/editar/:id',
-     component: PacienteFormComponent,
-     canActivate: [RoleGuard],
-     data: { role: UserRole.SECRETARIA }
-  },
-
-  { path: 'medicos/editar/:id',
-     component: MedicoFormComponent,
-     canActivate: [RoleGuard],
-     data: { role: UserRole.SECRETARIA }
-  },
-  { path: 'pacientes', component: PacienteListComponent },
-  { path: 'agenda', component: AgendaComponent },
-  // Se abrir o site vazio, vai para a página de Login!
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-
-  {
-    path: 'financeiro',
-    component: FinanceiroComponent,
-    canActivate: [RoleGuard],
-    data: { roles: ['ROLE_SECRETARIA'] }
+    data: { roles: [UserRole.SECRETARIA] }
   },
   {
-    path: 'medicos',
-    component: MedicoListComponent,
+    path: 'pacientes/editar/:id',
+    loadComponent: () =>
+      import('./pacientes/paciente-form/paciente-form').then((m) => m.PacienteFormComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_SECRETARIA'] }
+    data: { roles: [UserRole.SECRETARIA] }
+  },
+  {
+    path: 'medicos/editar/:id',
+    loadComponent: () => import('./medicos/medico-form/medico-form').then((m) => m.MedicoFormComponent),
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.SECRETARIA] }
+  },
+  {
+    path: 'pacientes',
+    loadComponent: () =>
+      import('./pacientes/paciente-list/paciente-list').then((m) => m.PacienteListComponent),
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.SECRETARIA] }
   },
   {
     path: 'agenda',
-    component: AgendaComponent,
+    loadComponent: () => import('./agendamentos/agenda/agenda').then((m) => m.AgendaComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_SECRETARIA', 'ROLE_MEDICO', 'ROLE_PACIENTE'] }
-  }
-
+    data: { roles: [UserRole.SECRETARIA, UserRole.MEDICO, UserRole.PACIENTE] }
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
 ];

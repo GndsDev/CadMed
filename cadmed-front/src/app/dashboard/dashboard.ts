@@ -4,9 +4,7 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { DashboardService } from '../services/dashboard.service';
 
-// 1. Importações do Chart.js
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+let chartJsRegistered = false;
 
 @Component({
   selector: 'app-dashboard',
@@ -29,7 +27,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   avisos: any[] = [];
 
   carregando = true;
-  graficoFluxo: any; // Instância do gráfico de barras
+  graficoFluxo?: import('chart.js').Chart;
 
   constructor(
     public authService: AuthService,
@@ -82,7 +80,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   // Ideia 5: Renderiza o gráfico de barras (Fluxo Semanal)
-  renderizarGraficoFluxo() {
+  async renderizarGraficoFluxo() {
     const canvas = document.getElementById('graficoFluxo') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -90,27 +88,30 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       this.graficoFluxo.destroy();
     }
 
-    // 1. Gera os rótulos dinamicamente (Ex: se hoje for Quinta, ele cria ['Sáb', 'Dom', 'Seg', 'Ter', 'Qua', 'Qui'])
-    const labelsDinamicas = [];
+    const { Chart, registerables } = await import('chart.js');
+    if (!chartJsRegistered) {
+      Chart.register(...registerables);
+      chartJsRegistered = true;
+    }
+
+    const labelsDinamicas: string[] = [];
     for (let i = 5; i >= 0; i--) {
       const data = new Date();
       data.setDate(data.getDate() - i);
-      // Pega o nome abreviado do dia em português (ex: "seg", "ter") e coloca com a primeira letra maiúscula
       let diaFormatado = data.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
       diaFormatado = diaFormatado.charAt(0).toUpperCase() + diaFormatado.slice(1);
       labelsDinamicas.push(diaFormatado);
     }
 
-    // 2. Pega os dados reais vindos do Java
     const dadosReaisDoGrafico = this.resumo.fluxoSemanal || [0, 0, 0, 0, 0, 0];
 
     this.graficoFluxo = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: labelsDinamicas, // <-- Nomes dos dias gerados dinamicamente
+        labels: labelsDinamicas,
         datasets: [{
           label: 'Atendimentos',
-          data: dadosReaisDoGrafico, // <-- Dados 100% reais do banco!
+          data: dadosReaisDoGrafico,
           backgroundColor: '#10b981',
           borderRadius: 5,
           barThickness: 25
@@ -124,7 +125,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           y: {
             beginAtZero: true,
             grid: { color: 'rgba(0,0,0,0.05)' },
-            ticks: { stepSize: 1 } // Garante que o eixo Y mostre números inteiros (1, 2, 3...)
+            ticks: { stepSize: 1 }
           },
           x: { grid: { display: false } }
         }
