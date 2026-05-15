@@ -159,10 +159,39 @@
 
 /* RESPONSIVIDADE (Celular) */
 @media (max-width: 600px) {
+  .form-section {
+    padding: 0;
+  }
+
+  .form-container {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .form-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .header-titles h2 {
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
   .form-grid {
     grid-template-columns: 1fr; /* Volta para 1 coluna no telemóvel */
+    gap: 1rem;
   }
+
   .span-2 {
     grid-column: span 1;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    width: 100%;
   }
 }

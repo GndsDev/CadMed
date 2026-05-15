@@ -19,6 +19,15 @@ export class AppComponent {
 
   sair() {
     this.authService.sair();
+    this.fecharMenu();
     this.router.navigate(['/login']);
+  }
+
+  alternarMenu() {
+    this.menuAberto = !this.menuAberto;
+  }
+
+  fecharMenu() {
+    this.menuAberto = false;
   }
 }
