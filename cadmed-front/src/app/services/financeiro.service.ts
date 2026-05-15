@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from "./auth.service"; // Ajuste o caminho se necessário
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FinanceiroService {
-  private apiUrl = 'http://localhost:8080/api/financeiro';
+  private apiUrl = environment.apiUrl + '/api/financeiro';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
